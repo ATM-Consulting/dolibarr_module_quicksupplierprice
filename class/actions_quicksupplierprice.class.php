@@ -59,30 +59,85 @@ class Actionsquicksupplierprice
 	 * @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
 	 * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
 	 */
-	function doActions($parameters, &$object, &$action, $hookmanager)
+	function formAddObjectLine($parameters, &$object, &$action, $hookmanager)
 	{
-		$error = 0; // Error counter
-		$myvalue = 'test'; // A result value
-
-		print_r($parameters);
-		echo "action: " . $action;
-		print_r($object);
-
-		if (in_array('somecontext', explode(':', $parameters['context'])))
+		
+		if (in_array('ordersuppliercard', explode(':', $parameters['context'])))
 		{
-		  // do something only for the context 'somecontext'
+		    global $db,$conf;
+            $form=new Form($db);
+            
+            ?>
+            <tr class="liste_titre nodrag nodrop">
+                <td>Ajout nouvelle ligne avec prix à la volée</td>
+                <td align="right">TVA</td>
+                <td align="right">P.U. HT</td>
+                <td align="right">Qté</td>
+                <td align="right">Réf.</td>
+                <td colspan="3">&nbsp;</td>
+            </tr>
+            <tr class="impair">
+                <td><?php 
+                    $form->select_produits(GETPOST('idprod_qsp'), 'idprod_qsp', '', $conf->product->limit_size, 1, -1);
+                    ?></td>
+                <td align="right"><?php
+                    echo $form->load_tva('tva_tx_qsp');
+                ?></td>
+                <td align="right"><input type="text" value="" class="flat" id="price_ht_qsp" name="price_ht_qsp" size="5"></td>
+                <td align="right"><input type="text" value="1" class="flat" id="qty_qsp" name="qty_qsp" size="2"></td>
+                <td align="right"><input type="text" value="" class="flat" id="ref_qsp" name="ref_qsp" size="5"></td>
+                <td align="right">&nbsp;</td>
+                <td colspan="3"><input type="button" name="bt_add_qsp" id="bt_add_qsp" value="Créer le prix et ajouter" class="button"/></td>
+            </tr>
+            <script type="text/javascript">
+                $(document).ready(function() {
+                    $("#bt_add_qsp").click(function() {
+                        $(this).fadeOut();
+                        
+                        $.ajax({
+                            url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
+                            ,data:{
+                                put:'updateprice'
+                                ,idprod:$("#idprod_qsp").val()
+                                ,fk_supplier:<?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>
+                                ,price:$("#price_ht_qsp").val()
+                                ,qty:$("#qty_qsp").val()
+                                ,tvatx:$("#tva_tx_qsp").val()
+                                ,ref:$("#ref_qsp").val()
+                            }
+                            ,method:"post"
+                            ,dataType:'json'
+                        }).done(function(data) {
+                            console.log(data);
+                            if(data.id>0) {
+                                
+                                setforpredef();
+                                
+                                $("#dp_desc").val( data.dp_desc );
+                                $("#idprodfournprice").replaceWith('<input type="hidden" name="idprodfournprice" id="idprodfournprice" value="'+data.id+'" />' );
+                                
+                                $("#qty").val($("#qty_qsp").val());
+                                
+                                $("#addline").click();
+                            }
+                            else{
+                                alert("Il y a une erreur dans votre saisie : "+data.error);
+                            }
+                            
+                        });          
+                    });
+                    
+                });
+                
+                
+                      
+                
+            </script>
+            <?
+            
 		}
 
-		if (! $error)
-		{
-			$this->results = array('myreturn' => $myvalue);
-			$this->resprints = 'A text to show';
-			return 0; // or return 1 to replace standard code
-		}
-		else
-		{
-			$this->errors[] = 'Error message';
-			return -1;
-		}
+		return 0; // or return 1 to replace standard code
+		
 	}
 }
