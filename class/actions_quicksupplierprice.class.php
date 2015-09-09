@@ -71,8 +71,8 @@ class Actionsquicksupplierprice
             <tr class="liste_titre nodrag nodrop">
                 <td>Ajout nouvelle ligne avec prix à la volée</td>
                 <td align="right">TVA</td>
-                <td align="right">P.U. HT</td>
                 <td align="right">Qté</td>
+                <td align="right">Total HT</td>
                 <td align="right">Réf.</td>
                 <td colspan="3">&nbsp;</td>
             </tr>
@@ -83,8 +83,8 @@ class Actionsquicksupplierprice
                 <td align="right"><?php
                     echo $form->load_tva('tva_tx_qsp');
                 ?></td>
-                <td align="right"><input type="text" value="" class="flat" id="price_ht_qsp" name="price_ht_qsp" size="5"></td>
                 <td align="right"><input type="text" value="1" class="flat" id="qty_qsp" name="qty_qsp" size="2"></td>
+                <td align="right"><input type="text" value="" class="flat" id="price_ht_qsp" name="price_ht_qsp" size="5"></td>
                 <td align="right"><input type="text" value="" class="flat" id="ref_qsp" name="ref_qsp" size="5"></td>
                 <td align="right">&nbsp;</td>
                 <td colspan="3"><input type="button" name="bt_add_qsp" id="bt_add_qsp" value="Créer le prix et ajouter" class="button"/></td>
