@@ -99,6 +99,7 @@ class Actionsquicksupplierprice
                             ,data:{
                                 put:'updateprice'
                                 ,idprod:$("#idprod_qsp").val()
+                                ,ref_search:$('#search_idprod_qsp').val()
                                 ,fk_supplier:<?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>
                                 ,price:$("#price_ht_qsp").val()
                                 ,qty:$("#qty_qsp").val()

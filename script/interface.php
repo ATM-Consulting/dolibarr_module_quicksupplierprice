@@ -11,7 +11,11 @@
         case 'updateprice':
             ob_start();
             $product = new ProductFournisseur($db);
-            $product->fetch(GETPOST('idprod'));
+            
+            $id_prod = (int)GETPOST('idprod');
+            $ref_search= GETPOST('ref_search');
+            $product->fetch($id_prod, $ref_search);
+            
             $npr = preg_match('/\*/', GETPOST('tvatx')) ? 1 : 0 ;
             
             $fourn = new Fournisseur($db);
