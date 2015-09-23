@@ -52,7 +52,7 @@ class modquicksupplierprice extends DolibarrModules
 
 		// Family can be 'crm','financial','hr','projects','products','ecm','technic','other'
 		// It is used to group modules in module setup page
-		$this->family = "other";
+		$this->family = "crm";
 		// Module label (no space allowed), used if translation string 'ModuleXXXName' not found (where XXX is value of numeric property 'numero' of module)
 		$this->name = preg_replace('/^mod/i','',get_class($this));
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
@@ -88,7 +88,7 @@ class modquicksupplierprice extends DolibarrModules
 		//							'workflow' => array('WORKFLOW_MODULE1_YOURACTIONTYPE_MODULE2'=>array('enabled'=>'! empty($conf->module1->enabled) && ! empty($conf->module2->enabled)', 'picto'=>'yourpicto@quicksupplierprice')) // Set here all workflow context managed by module
 		//                        );
 		$this->module_parts = array(
-            'hooks'=>array('ordersuppliercard')
+            'hooks'=>array('ordersuppliercard','invoicesuppliercard')
         );
 
 		// Data directories to create when module is enabled.
@@ -96,7 +96,7 @@ class modquicksupplierprice extends DolibarrModules
 		$this->dirs = array();
 
 		// Config pages. Put here list of php page, stored into quicksupplierprice/admin directory, to use to setup module.
-		$this->config_page_url = array("quicksupplierprice_setup.php@quicksupplierprice");
+		$this->config_page_url = array("quicksupplierprice_about.php@quicksupplierprice");
 
 		// Dependencies
 		$this->hidden = false;			// A condition to hide module

@@ -61,11 +61,13 @@ class Actionsquicksupplierprice
 	 */
 	function formAddObjectLine($parameters, &$object, &$action, $hookmanager)
 	{
-		
-		if (in_array('ordersuppliercard', explode(':', $parameters['context'])))
+		$TContext = explode(':', $parameters['context']);
+		if (in_array('ordersuppliercard', $TContext) || in_array('invoicesuppliercard', $TContext))
 		{
 		    global $db,$conf;
             $form=new Form($db);
+            
+            $colspan = in_array('ordersuppliercard', $TContext) ? 3 : 4;
             
             ?>
             <tr class="liste_titre nodrag nodrop">
@@ -74,7 +76,7 @@ class Actionsquicksupplierprice
                 <td align="right">Qté</td>
                 <td align="right">Total HT</td>
                 <td align="right">Réf.</td>
-                <td colspan="3">&nbsp;</td>
+                <td colspan="<?php echo $colspan+1 ?>">&nbsp;</td>
             </tr>
             <tr class="impair">
                 <td><?php 
@@ -87,7 +89,7 @@ class Actionsquicksupplierprice
                 <td align="right"><input type="text" value="" class="flat" id="price_ht_qsp" name="price_ht_qsp" size="5"></td>
                 <td align="right"><input type="text" value="" class="flat" id="ref_qsp" name="ref_qsp" size="5"></td>
                 <td align="right">&nbsp;</td>
-                <td colspan="3"><input type="button" name="bt_add_qsp" id="bt_add_qsp" value="Créer le prix et ajouter" class="button"/></td>
+                <td colspan="<?php echo $colspan ?>"><input type="button" name="bt_add_qsp" id="bt_add_qsp" value="Créer le prix et ajouter" class="button"/></td>
             </tr>
             <script type="text/javascript">
                 $(document).ready(function() {
