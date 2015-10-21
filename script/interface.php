@@ -29,9 +29,9 @@
             ob_clean();
             
               
-            if($ret!=0) __out( array('id'=>$ret,'error'=> $product->error) ,'json');
+            if($ret!=0) print json_encode( array('id'=>$ret,'error'=> $product->error) );
             else {
-                __out( array('id'=> $obj->rowid, 'error'=>'', 'dp_desc'=>$product->description ) ,'json' );
+                print json_encode(  array('id'=> $obj->rowid, 'error'=>'', 'dp_desc'=>$product->description ) );
             }    
                 
             break;
