@@ -136,7 +136,7 @@ class Actionsquicksupplierprice
                       
                 
             </script>
-            <?
+            <?php
             
 		}
 
