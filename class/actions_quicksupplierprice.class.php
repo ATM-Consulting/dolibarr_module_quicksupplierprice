@@ -64,11 +64,14 @@ class Actionsquicksupplierprice
 		$TContext = explode(':', $parameters['context']);
 		if (in_array('ordersuppliercard', $TContext) || in_array('invoicesuppliercard', $TContext))
 		{
-		    global $db,$conf;
+		    global $db,$conf,$mysoc;
             $form=new Form($db);
-            
+
+            $seller = new Fournisseur($db);
+            $seller->fetch($object->thirdparty->id);
+
             $colspan = in_array('ordersuppliercard', $TContext) ? 3 : 4;
-            
+
             ?>
             <tr class="liste_titre nodrag nodrop">
                 <td>Ajout nouvelle ligne avec prix à la volée</td>
@@ -79,11 +82,11 @@ class Actionsquicksupplierprice
                 <td colspan="<?php echo $colspan+1 ?>">&nbsp;</td>
             </tr>
             <tr class="impair">
-                <td><?php 
+                <td><?php
                     $form->select_produits(GETPOST('idprod_qsp'), 'idprod_qsp', '', $conf->product->limit_size, 1, -1);
                     ?></td>
                 <td align="right"><?php
-                    echo $form->load_tva('tva_tx_qsp');
+                    echo $form->load_tva('tva_tx_qsp',(isset($_POST["tva_tx_qsp"])?$_POST["tva_tx_qsp"]:-1),$seller,$mysoc);
                 ?></td>
                 <td align="right"><input type="text" value="1" class="flat" id="qty_qsp" name="qty_qsp" size="2"></td>
                 <td align="right"><input type="text" value="" class="flat" id="price_ht_qsp" name="price_ht_qsp" size="5"></td>
@@ -95,7 +98,7 @@ class Actionsquicksupplierprice
                 $(document).ready(function() {
                     $("#bt_add_qsp").click(function() {
                         $(this).fadeOut();
-                        
+
                         $.ajax({
                             url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
                             ,data:{
@@ -113,34 +116,34 @@ class Actionsquicksupplierprice
                         }).done(function(data) {
                             console.log(data);
                             if(data.id>0) {
-                                
+
                                 setforpredef();
-                                
+
                                 $("#dp_desc").val( data.dp_desc );
                                 $("#idprodfournprice").replaceWith('<input type="hidden" name="idprodfournprice" id="idprodfournprice" value="'+data.id+'" />' );
-                                
+
                                 $("#qty").val($("#qty_qsp").val());
-                                
+
                                 $("#addline").click();
                             }
                             else{
                                 alert("Il y a une erreur dans votre saisie : "+data.error);
                             }
-                            
-                        });          
+
+                        });
                     });
-                    
+
                 });
-                
-                
-                      
-                
+
+
+
+
             </script>
             <?php
-            
+
 		}
 
 		return 0; // or return 1 to replace standard code
-		
+
 	}
 }
