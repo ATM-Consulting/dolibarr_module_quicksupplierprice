@@ -67,7 +67,7 @@ class Actionsquicksupplierprice
 		    global $db,$conf,$mysoc;
             $form=new Form($db);
 
-            $seller = new Fournisseur($db);
+            $seller = new Societe($db);
             $seller->fetch($object->thirdparty->id);
 
             $colspan = in_array('ordersuppliercard', $TContext) ? 3 : 4;
