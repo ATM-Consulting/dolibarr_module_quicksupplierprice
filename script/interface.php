@@ -76,12 +76,16 @@
             $ref_search= GETPOST('ref_search');
             $price = GETPOST('price');
             $retour = $product->list_product_fournisseur_price($id_prod, 'pfp.price');
-            $liste = '';
+            $liste = '<td>';
             
+            foreach ($retour as $prix){
+                $liste .= 'chez ' . $prix->fourn_name . ' : ' . number_format($prix->fourn_price, 2) . '<br />';
+            }
             
+            $liste .= '</td>';
             ob_clean();
             
-            print json_encode(array('liste' => $retour));
+            print json_encode(array('liste' => $liste));
             
             break;
         

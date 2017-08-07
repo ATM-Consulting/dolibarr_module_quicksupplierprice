@@ -130,42 +130,14 @@ class Actionsquicksupplierprice
 
                             if(data.nb == 0){ // s'il n'y a pas de prix moins cher, on ajoute la ligne comme avant
                             	console.log('moins cher nullepart ailleurs');
-                            	/*
-                            	$.ajax({
-                                    url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
-                                    ,data:{
-                                        put:'updateprice'
-                                        ,idprod:$("#idprod_qsp").val()
-                                        ,ref_search:$('#search_idprod_qsp').val()
-                                        ,fk_supplier:<?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>
-                                        ,price:$("#price_ht_qsp").val()
-                                        ,qty:$("#qty_qsp").val()
-                                        ,tvatx:$("#tva_tx_qsp").val()
-                                        ,ref:$("#ref_qsp").val()
-                                    }
-                                    ,method:"post"
-                                    ,dataType:'json'
-                                }).done(function(data) {
-                                                                   
-                                    if(data.id>0) {
-
-                                        setforpredef();
-
-                                        $("#dp_desc").val( data.dp_desc );
-                                        $("#idprodfournprice").replaceWith('<input type="hidden" name="idprodfournprice" id="idprodfournprice" value="'+data.id+'" />' );
-
-                                        $("#qty").val($("#qty_qsp").val());
-
-                                        $("#addline").click();
-                                    }
-                                    else{
-                                        alert("Il y a une erreur dans votre saisie : "+data.error);
-                                    }
-                                });*/
+                            	updatePrice();
                                                                 
                             } else { // si le produit est moins cher ailleurs, on propose la liste des prix inférieurs
                             	console.log('moins cher ailleurs');
-                            	$.ajax({ // on check s'il existe un prix plus bas ailleurs
+
+                            	// listPrice();
+
+                            	$.ajax({
                                     url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
                                     ,data:{
                                         put: 'listeprice'
@@ -181,14 +153,51 @@ class Actionsquicksupplierprice
                                     ,dataType:'json'
                                 }).done(function(data){
 									console.log(data.liste);
+									$('#trliste').show().html(data.liste);
                                 });
+                                
                             }
                                                    
+                        });
+
                     });
 
+                    // fonction d'ajout d'un prix
+                    function updatePrice(){
+                    	$.ajax({
+                            url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
+                            ,data:{
+                                put:'updateprice'
+                                ,idprod:$("#idprod_qsp").val()
+                                ,ref_search:$('#search_idprod_qsp').val()
+                                ,fk_supplier:<?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>
+                                ,price:$("#price_ht_qsp").val()
+                                ,qty:$("#qty_qsp").val()
+                                ,tvatx:$("#tva_tx_qsp").val()
+                                ,ref:$("#ref_qsp").val()
+                            }
+                            ,method:"post"
+                            ,dataType:'json'
+                        }).done(function(data) {
+                                                           
+                            if(data.id>0) {
+
+                                setforpredef();
+
+                                $("#dp_desc").val( data.dp_desc );
+                                $("#idprodfournprice").replaceWith('<input type="hidden" name="idprodfournprice" id="idprodfournprice" value="'+data.id+'" />' );
+
+                                $("#qty").val($("#qty_qsp").val());
+
+                                $("#addline").click();
+                            }
+                            else{
+                                alert("Il y a une erreur dans votre saisie : "+data.error);
+                            }
+                        });
+                    }
+
                 });
-
-
 
 
             </script>
