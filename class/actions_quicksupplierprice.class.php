@@ -59,6 +59,15 @@ class Actionsquicksupplierprice
 	 * @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
 	 * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
 	 */
+	function doAction($parameters, &$object, &$action, $hookmanager)
+	{
+	    $TContext = explode(':', $parameters['context']);
+	    if (in_array('ordersuppliercard', $TContext) || in_array('invoicesuppliercard', $TContext))
+	    {
+	        var_dump($_POST);
+	    }
+	}
+	    
 	function formAddObjectLine($parameters, &$object, &$action, $hookmanager)
 	{
 		$TContext = explode(':', $parameters['context']);
@@ -94,15 +103,18 @@ class Actionsquicksupplierprice
                 <td align="right">&nbsp;</td>
                 <td colspan="<?php echo $colspan ?>"><input type="button" name="bt_add_qsp" id="bt_add_qsp" value="Créer le prix et ajouter" class="button"/></td>
             </tr>
+			<tr id="trliste" display="none"></tr>
+			            
             <script type="text/javascript">
                 $(document).ready(function() {
-                    $("#bt_add_qsp").click(function() {
-                        $(this).fadeOut();
 
-                        $.ajax({
+                    $("#bt_add_qsp").click(function() {
+                        //$(this).fadeOut();
+
+                        $.ajax({ // on check s'il existe un prix plus bas ailleurs
                             url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
                             ,data:{
-                                put:'updateprice'
+                                put: 'checkprice'
                                 ,idprod:$("#idprod_qsp").val()
                                 ,ref_search:$('#search_idprod_qsp').val()
                                 ,fk_supplier:<?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>
@@ -115,22 +127,63 @@ class Actionsquicksupplierprice
                             ,dataType:'json'
                         }).done(function(data) {
                             console.log(data);
-                            if(data.id>0) {
 
-                                setforpredef();
+                            if(data.nb == 0){ // s'il n'y a pas de prix moins cher, on ajoute la ligne comme avant
+                            	console.log('moins cher nullepart ailleurs');
+                            	/*
+                            	$.ajax({
+                                    url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
+                                    ,data:{
+                                        put:'updateprice'
+                                        ,idprod:$("#idprod_qsp").val()
+                                        ,ref_search:$('#search_idprod_qsp').val()
+                                        ,fk_supplier:<?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>
+                                        ,price:$("#price_ht_qsp").val()
+                                        ,qty:$("#qty_qsp").val()
+                                        ,tvatx:$("#tva_tx_qsp").val()
+                                        ,ref:$("#ref_qsp").val()
+                                    }
+                                    ,method:"post"
+                                    ,dataType:'json'
+                                }).done(function(data) {
+                                                                   
+                                    if(data.id>0) {
 
-                                $("#dp_desc").val( data.dp_desc );
-                                $("#idprodfournprice").replaceWith('<input type="hidden" name="idprodfournprice" id="idprodfournprice" value="'+data.id+'" />' );
+                                        setforpredef();
 
-                                $("#qty").val($("#qty_qsp").val());
+                                        $("#dp_desc").val( data.dp_desc );
+                                        $("#idprodfournprice").replaceWith('<input type="hidden" name="idprodfournprice" id="idprodfournprice" value="'+data.id+'" />' );
 
-                                $("#addline").click();
+                                        $("#qty").val($("#qty_qsp").val());
+
+                                        $("#addline").click();
+                                    }
+                                    else{
+                                        alert("Il y a une erreur dans votre saisie : "+data.error);
+                                    }
+                                });*/
+                                                                
+                            } else { // si le produit est moins cher ailleurs, on propose la liste des prix inférieurs
+                            	console.log('moins cher ailleurs');
+                            	$.ajax({ // on check s'il existe un prix plus bas ailleurs
+                                    url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
+                                    ,data:{
+                                        put: 'listeprice'
+                                        ,idprod:$("#idprod_qsp").val()
+                                        ,ref_search:$('#search_idprod_qsp').val()
+                                        ,fk_supplier:<?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>
+                                        ,price:$("#price_ht_qsp").val()
+                                        ,qty:$("#qty_qsp").val()
+                                        ,tvatx:$("#tva_tx_qsp").val()
+                                        ,ref:$("#ref_qsp").val()
+                                    }
+                                    ,method:"post"
+                                    ,dataType:'json'
+                                }).done(function(data){
+									console.log(data.liste);
+                                });
                             }
-                            else{
-                                alert("Il y a une erreur dans votre saisie : "+data.error);
-                            }
-
-                        });
+                                                   
                     });
 
                 });
