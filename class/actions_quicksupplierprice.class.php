@@ -59,12 +59,14 @@ class Actionsquicksupplierprice
 	 * @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
 	 * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
 	 */
-	function doAction($parameters, &$object, &$action, $hookmanager)
+	function doActions($parameters, &$object, &$action, $hookmanager)
 	{
 	    $TContext = explode(':', $parameters['context']);
 	    if (in_array('ordersuppliercard', $TContext) || in_array('invoicesuppliercard', $TContext))
 	    {
-	        var_dump($_POST);
+	        if(!empty($_POST)){
+	            var_dump($_POST);
+	        }
 	    }
 	}
 	    
@@ -134,7 +136,6 @@ class Actionsquicksupplierprice
                             } else { // si le produit est moins cher ailleurs, on propose la liste des prix inférieurs
                             	console.log('moins cher ailleurs');
                             	listPrice();            	
-                                
                             }
                                                    
                         });
@@ -166,6 +167,16 @@ class Actionsquicksupplierprice
 							}
 
 							$('#selectFourn').html(data.liste);
+
+							$('#selectFourn form').submit(function(e){
+								if($('input[name="prix"]:checked').length == 1){
+									if($('input[name="prix"]:checked').val() == 'saisie'){
+										e.preventDefault();
+										$('#selectFourn').dialog('close');
+										updatePrice();
+									}
+								}
+							});
 							
 							$('#selectFourn').dialog({
 								modal:true,

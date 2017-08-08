@@ -10,22 +10,32 @@
     switch($put){
         case 'updateprice': // création du prix fournisseur
             ob_start();
-            $product = new ProductFournisseur($db);
             
             $id_prod = (int)GETPOST('idprod');
             $ref_search= GETPOST('ref_search');
-            $product->fetch($id_prod, $ref_search);
             
-            $npr = preg_match('/\*/', GETPOST('tvatx')) ? 1 : 0 ;
-            
-            $fourn = new Fournisseur($db);
-            $fourn->fetch(GETPOST('fk_supplier'));
-            
-            $ret=$product->update_buyprice(GETPOST('qty'), GETPOST("price"), $user, 'HT', $fourn, 1, GETPOST('ref'), GETPOST('tvatx'), 0, 0, 0);
-            
-            $res = $db->query("SELECT MAX(rowid) as 'rowid' FROM ".MAIN_DB_PREFIX."product_fournisseur_price WHERE fk_product=".$product->id);
-            $obj = $db->fetch_object($res);  
+            // On vérifie si la ligne de tarif n'existe pas déjà pour ce fournisseur
+            $sql = "SELECT rowid FROM ".MAIN_DB_PREFIX."product_fournisseur_price WHERE fk_product=" . $db->escape(GETPOST('idprod'));
+            $sql .= "AND fk_soc=" . $db->escape(GETPOST('fk_supplier'));
+            $sql .= "AND price=" . $db->escape(GETPOST('price'));
+            $sql .= "AND quantity=" . $db->escape(GETPOST('qty'));
+            $res = $db->query($sql);
+            if($res){ // s'il existe
+                $obj = $db->fetch_object($res);
+                $ret = 0;
+            } else { // si on ne trouve rien
+                $product = new ProductFournisseur($db);
+                $product->fetch($id_prod, $ref_search);
                 
+                $fourn = new Fournisseur($db);
+                $fourn->fetch(GETPOST('fk_supplier'));
+                
+                $ret=$product->update_buyprice(GETPOST('qty'), GETPOST("price"), $user, 'HT', $fourn, 1, GETPOST('ref'), GETPOST('tvatx'), 0, 0, 0);
+                
+                $res = $db->query("SELECT MAX(rowid) as 'rowid' FROM ".MAIN_DB_PREFIX."product_fournisseur_price WHERE fk_product=".$product->id);
+                $obj = $db->fetch_object($res);  
+            }
+            
             ob_clean();
             
               
@@ -63,7 +73,7 @@
             $ref_search= GETPOST('ref_search');
             $price = GETPOST('price');
             $retour = $product->list_product_fournisseur_price($id_prod, 'pfp.price', 'DESC');
-            $liste = '<form action="'.dol_buildpath('/fourn/commandes/card.php', 1).'?id='.GETPOST('idcmd').'" method="POST">'."\n";
+            $liste = '<form action="'.dol_buildpath('/fourn/commande/card.php', 1).'?id='.GETPOST('idcmd').'" method="POST">'."\n";
             $liste .= '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
             $liste .= '<input type="hidden" name="action" value="selectprice">';
             $liste .= '<div><p>Plusieurs prix sont disponibles pour ce produit veuillez valider le prix saisie ou choisir le produit chez un autre fournisseur</p></div>';
@@ -73,7 +83,7 @@
             
             $liste .= '<tr><td><input type="radio" name="prix" value="saisie"></td>';
             $liste .= '<td>le prix que vous avez saisi chez ...</td>';
-            $liste .= '<td align="right">' . $price . '</td></tr>';
+            $liste .= '<td>' . $price . '</td></tr>';
             
             foreach ($retour as $prix){
                 if($prix->fourn_price < $price){
