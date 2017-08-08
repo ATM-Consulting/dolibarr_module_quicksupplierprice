@@ -64,8 +64,43 @@ class Actionsquicksupplierprice
 	    $TContext = explode(':', $parameters['context']);
 	    if (in_array('ordersuppliercard', $TContext) || in_array('invoicesuppliercard', $TContext))
 	    {
+	        
 	        if(!empty($_POST)){
-	            var_dump($_POST);
+	            global $db, $user;
+	            
+	            $action = GETPOST('action');
+	            if($action == 'selectprice'){
+	                $ligneprix = GETPOST('prix', 'int');
+	                
+	                // récupère la ligne prix fournisseur avec son id
+	                $pfp = new ProductFournisseur($db);
+	                $pfp->fetch_product_fournisseur_price($ligneprix);
+	                
+	                $product = new Product($db);
+	                $product->fetch($pfp->id);
+	                
+	                // crée une nouvelle commande fournisseur avec comme fournisseur celui de la ligne choisie
+	                $commande = new CommandeFournisseur($db);
+	                $commande->entity = 1;
+	                $commande->socid = $pfp->fourn_id;
+	                
+                    // crée la ligne produit dans cette commande
+	                $commande->lines[0] = new CommandeFournisseurLigne($db);
+	                	                
+	                $commande->lines[0]->qty = $db->escape(GETPOST('qty'));
+	                $commande->lines[0]->tva_tx = $pfp->fourn_tva_tx;
+	                $commande->lines[0]->fk_product = $pfp->fk_product;
+	                $commande->lines[0]->ref_fourn = $pfp->ref_supplier;   // $this->lines[$i]->ref_fourn comes from field ref into table of lines. Value may ba a ref that does not exists anymore, so we first try with value of product
+	                $commande->lines[0]->remise_percent = $pfp->fourn_remise_percent;
+	                $commande->lines[0]->product_type = $product->type;
+	                $commande->lines[0]->info_bits = 0;
+	                $commande->lines[0]->fk_unit = $pfp->fk_unit;
+	                
+	                $commande->create($user);
+	                
+	                setEventMessage('Une nouvelle commande fournisseur a été créée', 'mesgs');
+	               
+	            }
 	        }
 	    }
 	}
@@ -142,7 +177,7 @@ class Actionsquicksupplierprice
 
                     });
 
-                    // fonction qui renvoie la liste des prix inférieurs au prix saisie
+                    // fonction qui renvoie la liste des prix inférieurs au prix saisie dans un popin
                     function listPrice(){
                     	$.ajax({
                             url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
@@ -212,7 +247,8 @@ class Actionsquicksupplierprice
 
                                 $("#qty").val($("#qty_qsp").val());
 
-                                $("#addline").click();
+                                $("#addline").click(); 
+                                
                             }
                             else{
                                 alert("Il y a une erreur dans votre saisie : "+data.error);
