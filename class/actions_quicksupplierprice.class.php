@@ -103,7 +103,6 @@ class Actionsquicksupplierprice
                 <td align="right">&nbsp;</td>
                 <td colspan="<?php echo $colspan ?>"><input type="button" name="bt_add_qsp" id="bt_add_qsp" value="Créer le prix et ajouter" class="button"/></td>
             </tr>
-			<tr id="trliste" display="none"></tr>
 			            
             <script type="text/javascript">
                 $(document).ready(function() {
@@ -129,38 +128,51 @@ class Actionsquicksupplierprice
                             console.log(data);
 
                             if(data.nb == 0){ // s'il n'y a pas de prix moins cher, on ajoute la ligne comme avant
-                            	console.log('moins cher nullepart ailleurs');
+                            	console.log('pas moins cher ailleurs');
                             	updatePrice();
                                                                 
                             } else { // si le produit est moins cher ailleurs, on propose la liste des prix inférieurs
                             	console.log('moins cher ailleurs');
-
-                            	// listPrice();
-
-                            	$.ajax({
-                                    url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
-                                    ,data:{
-                                        put: 'listeprice'
-                                        ,idprod:$("#idprod_qsp").val()
-                                        ,ref_search:$('#search_idprod_qsp').val()
-                                        ,fk_supplier:<?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>
-                                        ,price:$("#price_ht_qsp").val()
-                                        ,qty:$("#qty_qsp").val()
-                                        ,tvatx:$("#tva_tx_qsp").val()
-                                        ,ref:$("#ref_qsp").val()
-                                    }
-                                    ,method:"post"
-                                    ,dataType:'json'
-                                }).done(function(data){
-									console.log(data.liste);
-									$('#trliste').show().html(data.liste);
-                                });
+                            	listPrice();            	
                                 
                             }
                                                    
                         });
 
                     });
+
+                    // fonction qui renvoie la liste des prix inférieurs au prix saisie
+                    function listPrice(){
+                    	$.ajax({
+                            url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
+                            ,data:{
+                                put: 'listeprice'
+                                ,idprod:$("#idprod_qsp").val()
+                                ,ref_search:$('#search_idprod_qsp').val()
+                                ,idcmd:<?php echo $object->id; ?>
+                                ,fk_supplier:<?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>
+                                ,price:$("#price_ht_qsp").val()
+                                ,qty:$("#qty_qsp").val()
+                                ,tvatx:$("#tva_tx_qsp").val()
+                                ,ref:$("#ref_qsp").val()
+                            }
+                            ,method:"post"
+                            ,dataType:'json'
+                        }).done(function(data){
+							console.log(data.liste);
+							
+							if($('#selectFourn').length==0) {
+								$('body').append('<div id="selectFourn" title="Sélection du prix"></div>');
+							}
+
+							$('#selectFourn').html(data.liste);
+							
+							$('#selectFourn').dialog({
+								modal:true,
+								width:'80%'
+							});									
+                        });
+                    }
 
                     // fonction d'ajout d'un prix
                     function updatePrice(){

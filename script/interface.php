@@ -38,13 +38,11 @@
             
         case 'checkprice': // vérifie s'il y a des prix inférieurs 
             ob_start();
-            $product = new ProductFournisseur($db); // pas utilisé dans cette partie
             
             // on récupère le produit
             $id_prod = (int)GETPOST('idprod');
             $ref_search= GETPOST('ref_search');
             $price = GETPOST('price');
-            $product->list_product_fournisseur_price($id_prod);
                        
             $sql = 'SELECT COUNT(*) as total FROM llx_product_fournisseur_price as pfp , llx_societe as s WHERE pfp.entity = 1 AND pfp.fk_soc = s.rowid AND s.status=1 AND pfp.fk_product = '.$id_prod.' AND pfp.price < '.$price;
             $res = $db->query($sql);
@@ -56,33 +54,42 @@
             break;
             
         case 'listeprice': // renvoie la liste des prix inférieurs
-             /*
-             $sql = 'SELECT s.nom as supplier_name, s.rowid as fourn_id, pfp.rowid as product_fourn_pri_id, pfp.ref_fourn, pfp.fk_product as product_fourn_id, pfp.fk_supplier_price_expression, pfp.price, pfp.quantity, pfp.unitprice, pfp.remise_percent, pfp.remise, pfp.tva_tx, pfp.fk_availability, pfp.charges, pfp.unitcharges, pfp.info_bits, pfp.delivery_time_days, pfp.supplier_reputation';
-             $sql .= 'FROM llx_product_fournisseur_price as pfp , llx_societe as s';
-             $sql .= 'WHERE pfp.entity IN ('.getEntity('productprice').')';
-             $sql .= 'AND pfp.fk_soc = s.rowid';
-             $sql .= 'AND s.status=1';
-             $sql .= 'AND pfp.fk_product = ' . $id_prod;
-             $sql .= 'AND pfp.price < ' . $price ;
-             $sql .= 'ORDER BY pfp.price DESC';
-             
-             $res = $db->query($sql);
-            */
+            
             ob_start();
             $product = new ProductFournisseur($db);
             
-            // on récupère le produit
+            // on récupère l'id produit
             $id_prod = (int)GETPOST('idprod');
             $ref_search= GETPOST('ref_search');
             $price = GETPOST('price');
-            $retour = $product->list_product_fournisseur_price($id_prod, 'pfp.price');
-            $liste = '<td>';
+            $retour = $product->list_product_fournisseur_price($id_prod, 'pfp.price', 'DESC');
+            $liste = '<form action="'.dol_buildpath('/fourn/commandes/card.php', 1).'?id='.GETPOST('idcmd').'" method="POST">'."\n";
+            $liste .= '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+            $liste .= '<input type="hidden" name="action" value="selectprice">';
+            $liste .= '<div><p>Plusieurs prix sont disponibles pour ce produit veuillez valider le prix saisie ou choisir le produit chez un autre fournisseur</p></div>';
+            $liste .= '<div class="div-table-responsive"><table class="noborder noshadow" width="100%"><thead>';
+            $liste .= '<tr class="liste_titre"><td width="20%">Choix</td><td>Fournisseur</td><td>Prix</td></tr>';
+            $liste .= '</thead><tbody>';
+            
+            $liste .= '<tr><td><input type="radio" name="prix" value="saisie"></td>';
+            $liste .= '<td>le prix que vous avez saisi chez ...</td>';
+            $liste .= '<td align="right">' . $price . '</td></tr>';
             
             foreach ($retour as $prix){
-                $liste .= 'chez ' . $prix->fourn_name . ' : ' . number_format($prix->fourn_price, 2) . '<br />';
+                if($prix->fourn_price < $price){
+                    $liste .= '<tr><td><input type="radio" name="prix" value="'.$prix->product_fourn_price_id.'"></td>';
+                    $liste .= '<td>'. $prix->fourn_name .'</td>';
+                    $liste .= '<td>' . number_format($prix->fourn_price, 2) . '</td></tr>';
+                }
             }
             
-            $liste .= '</td>';
+            $liste .= '</tbody></table></div>';
+            
+            $liste .= '<div class="center">';
+            $liste .= '<input type="submit" class="button" value="'.$langs->trans("Save").'">';
+            $liste .= '</div>';
+            $liste .= '</form>';
+            
             ob_clean();
             
             print json_encode(array('liste' => $liste));
