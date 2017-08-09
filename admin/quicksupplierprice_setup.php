@@ -103,12 +103,12 @@ print '<tr class="liste_titre">';
 print '<td>'.$langs->trans("Parameters").'</td>'."\n";
 print '<td align="center" width="20">&nbsp;</td>';
 print '<td align="center" width="100">'.$langs->trans("Value").'</td>'."\n";
-
+/*
 $var=!$var;
 print '<tr '.$bc[$var].'>';
 print '<td colspan="3">Aucun paramétrage n\'est nécessaire pour ce module</td>';
 print '</tr>';
-
+*/
 
 /*// Example with a yes / no select
 $var=!$var;
@@ -124,6 +124,19 @@ print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">'
 print '</form>';
 print '</td></tr>';
 */
+
+// Example with a yes / no select
+ $var=!$var;
+ print '<tr '.$bc[$var].'>';
+ print '<td>'.$langs->trans("BestPrice").'</td>';
+ print '<td align="center" width="20">&nbsp;</td>';
+ print '<td align="right" width="300">';
+ print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
+ print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+ print '<input type="hidden" name="action" value="set_QSPBESTPRICE">';
+ print ajax_constantonoff('QSPBESTPRICE');
+ print '</form>';
+ print '</td></tr>';
 
 
 print '</table>';

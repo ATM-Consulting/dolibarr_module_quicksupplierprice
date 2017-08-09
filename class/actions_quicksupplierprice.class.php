@@ -69,13 +69,16 @@ class Actionsquicksupplierprice
 	            global $db, $user;
 	            
 	            $action = GETPOST('action');
+	            
 	            if($action == 'selectprice'){
-	                $ligneprix = GETPOST('prix', 'int');
+	                $ligneprix = GETPOST('prix', 'int'); // id de la ligne dans llx_product_fournisseur_price
+	                $qte = $db->escape(GETPOST('qty')); // quantité à commander
 	                
 	                // récupère la ligne prix fournisseur avec son id
 	                $pfp = new ProductFournisseur($db);
 	                $pfp->fetch_product_fournisseur_price($ligneprix);
 	                
+	                // récupère le produit pour connaitre son type
 	                $product = new Product($db);
 	                $product->fetch($pfp->id);
 	                
@@ -87,7 +90,7 @@ class Actionsquicksupplierprice
                     // crée la ligne produit dans cette commande
 	                $commande->lines[0] = new CommandeFournisseurLigne($db);
 	                	                
-	                $commande->lines[0]->qty = $db->escape(GETPOST('qty'));
+	                $commande->lines[0]->qty = $qte;
 	                $commande->lines[0]->tva_tx = $pfp->fourn_tva_tx;
 	                $commande->lines[0]->fk_product = $pfp->fk_product;
 	                $commande->lines[0]->ref_fourn = $pfp->ref_supplier;   // $this->lines[$i]->ref_fourn comes from field ref into table of lines. Value may ba a ref that does not exists anymore, so we first try with value of product
@@ -147,7 +150,26 @@ class Actionsquicksupplierprice
                     $("#bt_add_qsp").click(function() {
                         //$(this).fadeOut();
 
-                        $.ajax({ // on check s'il existe un prix plus bas ailleurs
+                    	<?php 
+                            // on vérifie si la recherche de meilleurs prix est activée
+                    	if(!empty($conf->global->QSPBESTPRICE)){ // si c'est activé, on vérifie
+                    	    ?>
+                    	    checkPrice();
+                    	    <?php
+                    	} else { // sinon on met à jour immédiatement
+                    	    ?>
+                    	    updatePrice();
+                    	    <?php
+                        }
+                            
+                        ?>
+                        
+                        
+
+                    });
+
+                    function checkPrice(){
+                    	$.ajax({ // on check s'il existe un prix plus bas ailleurs
                             url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
                             ,data:{
                                 put: 'checkprice'
@@ -162,20 +184,18 @@ class Actionsquicksupplierprice
                             ,method:"post"
                             ,dataType:'json'
                         }).done(function(data) {
-                            console.log(data);
 
-                            if(data.nb == 0){ // s'il n'y a pas de prix moins cher, on ajoute la ligne comme avant
+                            if(data.nb == 0){ // s'il n'y a pas de prix moins cher, on ajoute la ligne commande et la ligne prix_fourn comme avant
                             	console.log('pas moins cher ailleurs');
                             	updatePrice();
                                                                 
                             } else { // si le produit est moins cher ailleurs, on propose la liste des prix inférieurs
                             	console.log('moins cher ailleurs');
-                            	listPrice();            	
+                            	listPrice();
                             }
                                                    
                         });
-
-                    });
+                    }
 
                     // fonction qui renvoie la liste des prix inférieurs au prix saisie dans un popin
                     function listPrice(){
@@ -216,7 +236,9 @@ class Actionsquicksupplierprice
 							$('#selectFourn').dialog({
 								modal:true,
 								width:'80%'
-							});									
+							});	
+
+							// $('#selectFourn').parent().find('button')[0].remove();							
                         });
                     }
 
@@ -252,6 +274,7 @@ class Actionsquicksupplierprice
                             }
                             else{
                                 alert("Il y a une erreur dans votre saisie : "+data.error);
+                                console.log(data.id);
                             }
                         });
                     }
