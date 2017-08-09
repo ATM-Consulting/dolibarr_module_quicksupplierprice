@@ -82,26 +82,46 @@ class Actionsquicksupplierprice
 	                $product = new Product($db);
 	                $product->fetch($pfp->id);
 	                
-	                // crée une nouvelle commande fournisseur avec comme fournisseur celui de la ligne choisie
-	                $commande = new CommandeFournisseur($db);
-	                $commande->entity = 1;
-	                $commande->socid = $pfp->fourn_id;
+	                if($object->fourn_id == $pfp->fourn_id){
+	                    $object->addline(
+	                        ''
+	                        , $pfp->price
+	                        , $qte
+	                        ,$pfp->fourn_tva_tx
+	                        ,0
+	                        ,0
+	                        ,$pfp->fk_product
+	                        ,$pfp->id
+	                        ,$pfp->ref_supplier
+	                        ,$pfp->fourn_remise_percent
+	                        ,'HT'
+	                        ,''
+	                        ,$product->type
+	                        );
+	                    setEventMessage('la ligne a été ajoutée à cette commande', 'mesgs');
+	                } else {
+	                    // crée une nouvelle commande fournisseur avec comme fournisseur celui de la ligne choisie
+    	                $commande = new CommandeFournisseur($db);
+    	                $commande->entity = 1;
+    	                $commande->socid = $pfp->fourn_id;
+    	                
+                        // crée la ligne produit dans cette commande
+    	                $commande->lines[0] = new CommandeFournisseurLigne($db);
+    	                	                
+    	                $commande->lines[0]->qty = $qte;
+    	                $commande->lines[0]->tva_tx = $pfp->fourn_tva_tx;
+    	                $commande->lines[0]->fk_product = $pfp->fk_product;
+    	                $commande->lines[0]->ref_fourn = $pfp->ref_supplier;   // $this->lines[$i]->ref_fourn comes from field ref into table of lines. Value may ba a ref that does not exists anymore, so we first try with value of product
+    	                $commande->lines[0]->remise_percent = $pfp->fourn_remise_percent;
+    	                $commande->lines[0]->product_type = $product->type;
+    	                $commande->lines[0]->info_bits = 0;
+    	                $commande->lines[0]->fk_unit = $pfp->fk_unit;
+    	                
+    	                $commande->create($user);
+    	                setEventMessage('Une nouvelle commande fournisseur a été créée', 'mesgs');
+	                }
 	                
-                    // crée la ligne produit dans cette commande
-	                $commande->lines[0] = new CommandeFournisseurLigne($db);
-	                	                
-	                $commande->lines[0]->qty = $qte;
-	                $commande->lines[0]->tva_tx = $pfp->fourn_tva_tx;
-	                $commande->lines[0]->fk_product = $pfp->fk_product;
-	                $commande->lines[0]->ref_fourn = $pfp->ref_supplier;   // $this->lines[$i]->ref_fourn comes from field ref into table of lines. Value may ba a ref that does not exists anymore, so we first try with value of product
-	                $commande->lines[0]->remise_percent = $pfp->fourn_remise_percent;
-	                $commande->lines[0]->product_type = $product->type;
-	                $commande->lines[0]->info_bits = 0;
-	                $commande->lines[0]->fk_unit = $pfp->fk_unit;
 	                
-	                $commande->create($user);
-	                
-	                setEventMessage('Une nouvelle commande fournisseur a été créée', 'mesgs');
 	               
 	            }
 	        }
@@ -150,22 +170,25 @@ class Actionsquicksupplierprice
                     $("#bt_add_qsp").click(function() {
                         //$(this).fadeOut();
 
-                    	<?php 
+                        if($("#idprod_qsp").val() == 0){
+                            alert('Aucun produit sélectionné');
+                        } else {
+                        	<?php 
                             // on vérifie si la recherche de meilleurs prix est activée
-                    	if(!empty($conf->global->QSPBESTPRICE)){ // si c'est activé, on vérifie
-                    	    ?>
-                    	    checkPrice();
-                    	    <?php
-                    	} else { // sinon on met à jour immédiatement
-                    	    ?>
-                    	    updatePrice();
-                    	    <?php
-                        }
-                            
-                        ?>
-                        
-                        
+                        	if(!empty($conf->global->QSPBESTPRICE)){ // si c'est activé, on vérifie
+                        	    ?>
+                        	    checkPrice();
+                        	    <?php
+                        	} else { // sinon on met à jour immédiatement
+                        	    ?>
+                        	    updatePrice();
+                        	    <?php
+                            }
+                                
+                            ?>
 
+                        }
+                        
                     });
 
                     function checkPrice(){
