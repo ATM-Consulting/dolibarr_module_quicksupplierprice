@@ -66,11 +66,11 @@ class Actionsquicksupplierprice
 	    {
 	        
 	        if(!empty($_POST)){
-	            global $db, $user;
+	            global $db, $user, $langs;
 	            
 	            $action = GETPOST('action');
 	            
-	            if($action == 'selectprice'){
+	            if($action == 'selectpriceQSP'){
 	                $ligneprix = GETPOST('prix', 'int'); // id de la ligne dans llx_product_fournisseur_price
 	                $qte = $db->escape(GETPOST('qty')); // quantité à commander
 	                
@@ -98,6 +98,11 @@ class Actionsquicksupplierprice
 	                        ,''
 	                        ,$product->type
 	                        );
+	                    
+	                    // regénérer le pdf
+	                    $result=$object->generateDocument($object->modelpdf, $langs, $hidedetails, $hidedesc, $hideref);
+	                    if ($result < 0) dol_print_error($db,$result);
+	                    
 	                    setEventMessage('la ligne a été ajoutée à cette commande', 'mesgs');
 	                } else {
 	                    // crée une nouvelle commande fournisseur avec comme fournisseur celui de la ligne choisie
@@ -186,7 +191,6 @@ class Actionsquicksupplierprice
                             }
                                 
                             ?>
-
                         }
                         
                     });
