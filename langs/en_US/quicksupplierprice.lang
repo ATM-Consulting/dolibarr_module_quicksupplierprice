@@ -7,3 +7,5 @@ quicksupplierpriceSetup = quicksupplierprice module setup
 quicksupplierpriceAbout = About quicksupplierprice
 
 BestPrice = Search for lower prices when creating the line
+NewCommandeGen = A new command has been created
+CommandLineAdded = The line has been added to this command

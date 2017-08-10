@@ -67,6 +67,7 @@ class Actionsquicksupplierprice
 	        
 	        if(!empty($_POST)){
 	            global $db, $user, $langs;
+	            $langs->load('quicksupplierprice@quicksupplierprice');
 	            
 	            $action = GETPOST('action');
 	            
@@ -103,7 +104,7 @@ class Actionsquicksupplierprice
 	                    $result=$object->generateDocument($object->modelpdf, $langs, $hidedetails, $hidedesc, $hideref);
 	                    if ($result < 0) dol_print_error($db,$result);
 	                    
-	                    setEventMessage('la ligne a été ajoutée à cette commande', 'mesgs');
+	                    setEventMessage($langs->trans('CommandLineAdded'), 'mesgs');
 	                } else {
 	                    // crée une nouvelle commande fournisseur avec comme fournisseur celui de la ligne choisie
     	                $commande = new CommandeFournisseur($db);
@@ -123,7 +124,7 @@ class Actionsquicksupplierprice
     	                $commande->lines[0]->fk_unit = $pfp->fk_unit;
     	                
     	                $commande->create($user);
-    	                setEventMessage('Une nouvelle commande fournisseur a été créée', 'mesgs');
+    	                setEventMessage($langs->trans('NewCommandeGen') . ' ref : ' . $commande->getNomUrl(), 'warnings');
 	                }
 	                
 	                

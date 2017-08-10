@@ -7,3 +7,5 @@ quicksupplierpriceSetup = Configuration du module Prix Fournisseur Rapide
 quicksupplierpriceAbout = A propos du module Prix Fournisseur Rapide
 
 BestPrice = Chercher les prix inférieurs lors de la création de la ligne
+NewCommandeGen = Une nouvelle commande fournisseur a été créée
+CommandLineAdded = La ligne a été ajoutée à cette commande

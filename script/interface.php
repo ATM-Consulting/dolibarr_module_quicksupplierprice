@@ -17,6 +17,9 @@
     $tva = (int)GETPOST('tvatx');                       // taux de tva saisi
     $id_commande = (int)GETPOST('idcmd');               // id de la commande en cours de modification
     
+    // si la ref est laissée vide je rempli la ref
+    if($ref == '') $ref = 'FP-'. $fk_soc . '-' . $id_prod . '-' . $price;
+    
     switch($put){
         case 'updateprice': // renvoie l'id d'une ligne produit
             ob_start();
@@ -40,13 +43,14 @@
                 $fourn->fetch($fk_soc);
                 
                 $ret=$product->update_buyprice($qte , $price, $user, 'HT', $fourn, 1, $ref, $tva, 0, 0, 0);
-                $res = $db->query("SELECT MAX(rowid) as 'rowid' FROM ".MAIN_DB_PREFIX."product_fournisseur_price WHERE fk_product=".$product->id);
-                $obj = $db->fetch_object($res); 
+                //$res = $db->query("SELECT MAX(rowid) as 'rowid' FROM ".MAIN_DB_PREFIX."product_fournisseur_price WHERE fk_product=".$product->id);
+                //$obj = $db->fetch_object($res); 
+                $obj->rowid = $ret;
             }
             
             ob_clean();
                           
-            if($ret!=0) print json_encode( array('id'=>$ret,'error'=> $product->error) );
+            if($ret<0) print json_encode( array('id'=>$ret,'error'=> $product->error) );
             else {
                 print json_encode(  array('id'=> $obj->rowid, 'error'=>'', 'dp_desc'=>$product->description ) );
             }
@@ -87,7 +91,7 @@
             $liste .= '<td align="right">' . number_format($unitprice, 2) . '</td>';
             $liste .= '<td align="right">' . $qte . '</td>';
             $liste .= '<td align="right">' . number_format($price, 2) . '</td>';
-            $liste .= '<td align="right" style="padding-right: 20px;"><input type="radio" name="prix" value="saisie"></td></tr>';
+            $liste .= '<td align="right" style="padding-right: 20px;"><input type="radio" name="prix" value="saisie" checked></td></tr>';
             
             foreach ($retour as $prix){
                 if($prix->fourn_unitprice < $unitprice){
