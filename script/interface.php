@@ -17,8 +17,8 @@
     $tva = (int)GETPOST('tvatx');                       // taux de tva saisi
     $id_commande = (int)GETPOST('idcmd');               // id de la commande en cours de modification
     
-    // si la ref est laissée vide je rempli la ref
-    if($ref == '') $ref = 'FP-'.$fk_soc.'-'.$id_prod.'-'.$price;
+    // si la ref est laissée vide je rempli la ref (ne pas utiliser pour l'instant)
+    // if($ref == '') $ref = 'FP-'.$fk_soc.'-'.$id_prod.'-'.$price;
     
     switch($put){
         case 'updateprice': // renvoie l'id d'une ligne produit
