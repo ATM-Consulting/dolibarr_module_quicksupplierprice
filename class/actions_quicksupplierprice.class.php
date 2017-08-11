@@ -73,7 +73,7 @@ class Actionsquicksupplierprice
 	            
 	            if($action == 'selectpriceQSP'){
 	                $ligneprix = GETPOST('prix', 'int'); // id de la ligne dans llx_product_fournisseur_price
-	                $qte = $db->escape(GETPOST('qty')); // quantité à commander
+	                $qte = GETPOST('qty', 'int');        // quantité à commander
 	                
 	                // récupère la ligne prix fournisseur avec son id
 	                $pfp = new ProductFournisseur($db);
@@ -83,7 +83,8 @@ class Actionsquicksupplierprice
 	                $product = new Product($db);
 	                $product->fetch($pfp->id);
 	                
-	                if($object->fourn_id == $pfp->fourn_id){
+	                // si le fournisseur de la commande en cours est le même que la ligne produit sélectionnée, on ajoute une ligne à cette commande
+	                if($object->fourn_id == $pfp->fourn_id){ 
 	                    $object->addline(
 	                        ''
 	                        , $pfp->price
@@ -100,11 +101,12 @@ class Actionsquicksupplierprice
 	                        ,$product->type
 	                        );
 	                    
-	                    // regénérer le pdf
+	                    // regénérer le pdf pour que la ligne ajoutée apparaisse
 	                    $result=$object->generateDocument($object->modelpdf, $langs, $hidedetails, $hidedesc, $hideref);
 	                    if ($result < 0) dol_print_error($db,$result);
 	                    
 	                    setEventMessage($langs->trans('CommandLineAdded'), 'mesgs');
+	                    
 	                } else {
 	                    // crée une nouvelle commande fournisseur avec comme fournisseur celui de la ligne choisie
     	                $commande = new CommandeFournisseur($db);
@@ -127,8 +129,6 @@ class Actionsquicksupplierprice
     	                setEventMessage($langs->trans('NewCommandeGen') . ' ref : ' . $commande->getNomUrl(), 'warnings');
 	                }
 	                
-	                
-	               
 	            }
 	        }
 	    }
@@ -174,7 +174,6 @@ class Actionsquicksupplierprice
                 $(document).ready(function() {
 
                     $("#bt_add_qsp").click(function() {
-                        //$(this).fadeOut();
 
                         if($("#idprod_qsp").val() == 0){
                             alert('Aucun produit sélectionné');
@@ -225,7 +224,7 @@ class Actionsquicksupplierprice
                         });
                     }
 
-                    // fonction qui renvoie la liste des prix inférieurs au prix saisie dans un popin
+                    // fonction qui renvoie la liste des prix inférieurs au prix saisie dans un popin (#selectfourn)
                     function listPrice(){
                     	$.ajax({
                             url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
@@ -243,7 +242,6 @@ class Actionsquicksupplierprice
                             ,method:"post"
                             ,dataType:'json'
                         }).done(function(data){
-							console.log(data.liste);
 							
 							if($('#selectFourn').length==0) {
 								$('body').append('<div id="selectFourn" title="Sélection du prix"></div>');
@@ -252,12 +250,11 @@ class Actionsquicksupplierprice
 							$('#selectFourn').html(data.liste);
 
 							$('#selectFourn form').submit(function(e){
-								if($('input[name="prix"]:checked').length == 1){
-									if($('input[name="prix"]:checked').val() == 'saisie'){
-										e.preventDefault();
-										$('#selectFourn').dialog('close');
-										updatePrice();
-									}
+								if($('input[name="prix"]:checked').val() == 'saisie'){
+									// correspond au cas ou l'utilisateur valide son prix même s'il en existe des moins chers
+									e.preventDefault();
+									$('#selectFourn').dialog('close');
+									updatePrice(); // on crée le prix
 								}
 							});
 							
@@ -265,8 +262,7 @@ class Actionsquicksupplierprice
 								modal:true,
 								width:'80%'
 							});	
-
-							// $('#selectFourn').parent().find('button')[0].remove();							
+					
                         });
                     }
 
@@ -302,7 +298,7 @@ class Actionsquicksupplierprice
                             }
                             else{
                                 alert("Il y a une erreur dans votre saisie : "+data.error);
-                                console.log(data.id);
+                                console.log(data.id); // correspond au code erreur retourné par la méthode de création de ligne prix
                             }
                         });
                     }

@@ -18,7 +18,7 @@
     $id_commande = (int)GETPOST('idcmd');               // id de la commande en cours de modification
     
     // si la ref est laissée vide je rempli la ref
-    if($ref == '') $ref = 'FP-'. $fk_soc . '-' . $id_prod . '-' . $price;
+    if($ref == '') $ref = 'FP-'.$fk_soc.'-'.$id_prod.'-'.$price;
     
     switch($put){
         case 'updateprice': // renvoie l'id d'une ligne produit
@@ -42,9 +42,8 @@
                 $fourn = new Fournisseur($db);
                 $fourn->fetch($fk_soc);
                 
-                $ret=$product->update_buyprice($qte , $price, $user, 'HT', $fourn, 1, $ref, $tva, 0, 0, 0);
-                //$res = $db->query("SELECT MAX(rowid) as 'rowid' FROM ".MAIN_DB_PREFIX."product_fournisseur_price WHERE fk_product=".$product->id);
-                //$obj = $db->fetch_object($res); 
+                // La methode update_buyprice() renvoie -1 ou -2 en cas d'erreur ou l'id de l'objet modifié ou créé en cas de réussite
+                $ret=$product->update_buyprice($qte , $price, $user, 'HT', $fourn, 1, $ref, $tva, 0, 0, 0); 
                 $obj->rowid = $ret;
             }
             
@@ -57,10 +56,16 @@
                
             break;
             
-        case 'checkprice': // vérifie s'il y a des prix strictement inférieurs et on en renvoie le nombre
+        case 'checkprice': // vérifie s'il y a des prix unitaire strictement inférieurs et on en renvoie le nombre
             ob_start();
             
-            $sql = 'SELECT COUNT(*) as total FROM llx_product_fournisseur_price as pfp , llx_societe as s WHERE pfp.entity = 1 AND pfp.fk_soc = s.rowid AND s.status=1 AND pfp.fk_product = '.$id_prod.' AND pfp.unitprice < '.$unitprice;
+            $sql = 'SELECT COUNT(*) as total';
+            $sql .= ' FROM ' . MAIN_DB_PREFIX .'product_fournisseur_price as pfp , ' . MAIN_DB_PREFIX .'societe as s';
+            $sql .= ' WHERE pfp.entity = 1';
+            $sql .= ' AND pfp.fk_soc = s.rowid';
+            $sql .= ' AND s.status=1';
+            $sql .= ' AND pfp.fk_product = '.$id_prod.' AND pfp.unitprice < '.$unitprice;
+            
             $res = $db->query($sql);
             $obj = $db->fetch_object($res);
                                     
