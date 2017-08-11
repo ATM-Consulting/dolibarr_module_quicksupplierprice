@@ -34,7 +34,7 @@
             
             if($resq->num_rows !== 0){ // s'il existe, on renvoie l'id de cet ligne prix
                 $obj = $db->fetch_object($resq);
-                $ret = 0;
+                $ret = $obj->rowid;
             } else { // si on ne trouve rien, création du prix fournisseur
                 $product = new ProductFournisseur($db);
                 $product->fetch($id_prod, $ref_search);
@@ -44,14 +44,13 @@
                 
                 // La methode update_buyprice() renvoie -1 ou -2 en cas d'erreur ou l'id de l'objet modifié ou créé en cas de réussite
                 $ret=$product->update_buyprice($qte , $price, $user, 'HT', $fourn, 1, $ref, $tva, 0, 0, 0); 
-                $obj->rowid = $ret;
             }
             
             ob_clean();
                           
-            if($ret<0) print json_encode( array('id'=>$ret,'error'=> $product->error) );
+            if($ret<0) print json_encode( array('retour'=>$ret,'error'=> $product->error) );
             else {
-                print json_encode(  array('id'=> $obj->rowid, 'error'=>'', 'dp_desc'=>$product->description ) );
+                print json_encode(  array('retour'=> $ret, 'error'=>'', 'dp_desc'=>$product->description ) );
             }
                
             break;

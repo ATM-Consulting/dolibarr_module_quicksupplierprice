@@ -283,22 +283,22 @@ class Actionsquicksupplierprice
                             ,method:"post"
                             ,dataType:'json'
                         }).done(function(data) {
-                                                           
-                            if(data.id>0) {
+
+                            if(data.retour >0) { // si le retour est positif, c'est l'id du prix-produit-fournisseur
 
                                 setforpredef();
 
                                 $("#dp_desc").val( data.dp_desc );
-                                $("#idprodfournprice").replaceWith('<input type="hidden" name="idprodfournprice" id="idprodfournprice" value="'+data.id+'" />' );
+                                $("#idprodfournprice").replaceWith('<input type="hidden" name="idprodfournprice" id="idprodfournprice" value="'+data.retour+'" />' );
 
                                 $("#qty").val($("#qty_qsp").val());
 
                                 $("#addline").click(); 
                                 
                             }
-                            else{
+                            else{ // sinon c'est un code erreur 
                                 alert("Il y a une erreur dans votre saisie : "+data.error);
-                                console.log(data.id); // correspond au code erreur retourné par la méthode de création de ligne prix
+                                console.log(data.retour); // correspond au code erreur retourné par la méthode de création de ligne prix
                             }
                         });
                     }
