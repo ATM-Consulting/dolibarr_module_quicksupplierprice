@@ -74,6 +74,8 @@
             break;
             
         case 'listeprice': // renvoie la liste des prix inférieurs
+            global $langs;
+            $langs->load('quicksupplierprice@quicksupplierprice');
             
             ob_start();
             
@@ -91,19 +93,20 @@
             $liste .= '<tr class="liste_titre"><td>Fournisseur</td><td align="right">P.U. HT</td><td align="right">Quantité minimum</td><td align="right">Total HT</td><td width="20%" align="right" style="padding-right: 20px;">Choix</td></tr>';
             $liste .= '</thead><tbody>';
             
-            $liste .= '<tr><td>le prix que vous avez saisi </td>';
-            $liste .= '<td align="right">' . number_format($unitprice, 2) . '</td>';
-            $liste .= '<td align="right">' . $qte . '</td>';
-            $liste .= '<td align="right">' . number_format($price, 2) . '</td>';
-            $liste .= '<td align="right" style="padding-right: 20px;"><input type="radio" name="prix" value="saisie" checked></td></tr>';
+            $liste .= '<tr><td><label for="saisie">'.$langs->trans('validPrice').' '.$langs->trans('AddedToThis').'</label></td>';
+            $liste .= '<td align="right"><label for="saisie">' . number_format($unitprice, 2) . '</label></td>';
+            $liste .= '<td align="right"><label for="saisie">' . $qte . '</label></td>';
+            $liste .= '<td align="right"><label for="saisie">' . number_format($price, 2) . '</label></td>';
+            $liste .= '<td align="right" style="padding-right: 20px;"><input id="saisie" type="radio" name="prix" value="saisie" checked></td></tr>';
             
             foreach ($retour as $prix){
                 if($prix->fourn_unitprice < $unitprice){
-                    $liste .= '<tr><td>'. $prix->fourn_name .'</td>';
-                    $liste .= '<td align="right">' . number_format($prix->fourn_unitprice, 2) . '</td>';
-                    $liste .= '<td align="right">' . $prix->fourn_qty . '</td>';
-                    $liste .= '<td align="right">' . number_format($prix->fourn_price, 2) . '</td>';
-                    $liste .= '<td align="right" style="padding-right: 20px;"><input type="radio" name="prix" value="'.$prix->product_fourn_price_id.'"></td></tr>';
+                    $tooltip = ($fk_soc == $prix->fourn_id) ? $langs->trans('AddedToThis') : $langs->trans('NewCommand');
+                    $liste .= '<tr><td><label for="sel_'.$prix->product_fourn_price_id.'">'. $prix->fourn_name .' '.$tooltip.'</label></td>';
+                    $liste .= '<td align="right"><label for="sel_'.$prix->product_fourn_price_id.'">' . number_format($prix->fourn_unitprice, 2) . '</label></td>';
+                    $liste .= '<td align="right"><label for="sel_'.$prix->product_fourn_price_id.'">' . $prix->fourn_qty . '</label></td>';
+                    $liste .= '<td align="right"><label for="sel_'.$prix->product_fourn_price_id.'">' . number_format($prix->fourn_price, 2) . '</label></td>';
+                    $liste .= '<td align="right" style="padding-right: 20px;"><input id="sel_'.$prix->product_fourn_price_id.'" type="radio" name="prix" value="'.$prix->product_fourn_price_id.'"></td></tr>';
                 }
             }
             
