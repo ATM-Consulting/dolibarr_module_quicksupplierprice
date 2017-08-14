@@ -8,6 +8,8 @@ quicksupplierpriceAbout = A propos du module Prix Fournisseur Rapide
 
 BestPrice = Chercher les prix inférieurs lors de la création de la ligne
 NewCommandeGen = Une nouvelle commande fournisseur a été créée
+
+PriceSelection = Sélection du prix
 NewCommand = (Une nouvelle commande sera créée chez ce fournisseur pour ce produit)
 CommandLineAdded = La ligne a été ajoutée à cette commande
 validPrice = Le prix que vous avez saisi

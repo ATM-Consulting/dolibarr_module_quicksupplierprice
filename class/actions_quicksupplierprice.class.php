@@ -141,7 +141,7 @@ class Actionsquicksupplierprice
 	                $commande->create($user);
 	                setEventMessage($langs->trans('NewCommandeGen') . ' ref : ' . $commande->getNomUrl(), 'warnings');
                 }
-                
+                                
             }
 	    }
 	}
@@ -151,7 +151,7 @@ class Actionsquicksupplierprice
 		$TContext = explode(':', $parameters['context']);
 		if (in_array('ordersuppliercard', $TContext) || in_array('invoicesuppliercard', $TContext))
 		{
-		    global $db,$conf,$mysoc;
+		    global $db,$conf,$mysoc,$langs;
             $form=new Form($db);
 
             $seller = new Societe($db);
@@ -239,7 +239,7 @@ console.log(data.nb);
                     // fonction qui ajoute la liste des prix inférieurs au prix saisie dans un popin (#selectfourn)
                     function listPrice(data){
                 		if($('#selectFourn').length==0) {
-							$('body').append('<div id="selectFourn" title="Sélection du prix"></div>');
+							$('body').append('<div id="selectFourn" title="<?php echo $langs->transnoentities('PriceSelection'); ?>"></div>');
 						}
 
 						$('#selectFourn').html(data.liste);

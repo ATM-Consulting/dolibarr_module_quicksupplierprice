@@ -8,6 +8,8 @@ quicksupplierpriceAbout = About quicksupplierprice
 
 BestPrice = Search for lower prices when creating the line
 NewCommandeGen = A new command has been created
+
+PriceSelection = Price selection
 NewCommand = (A new command will be created for this supplier for this product)
 CommandLineAdded = The line has been added to this command
 validPrice = The price you've entered

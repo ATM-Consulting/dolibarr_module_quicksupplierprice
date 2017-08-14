@@ -8,13 +8,13 @@
     $put = GETPOST('put');
     
     $id_prod = (int)GETPOST('idprod');                  // id du produit demandé
-    $ref_search= $db->escape(GETPOST('ref_search'));    // ref du produit demandé
-    $ref = $db->escape(GETPOST('ref'));                 // ref entrée par l'utilisateur
-    $fk_soc = $db->escape(GETPOST('fk_supplier'));      // id du fournisseur
-    $price = $db->escape(GETPOST('price'));             // prix entré par l'utilisateur
+    $ref_search= GETPOST('ref_search', 'alpha');        // ref du produit demandé
+    $ref = GETPOST('ref', 'alpha');                     // ref entrée par l'utilisateur
+    $fk_soc = GETPOST('fk_supplier', 'int');            // id du fournisseur
+    $price = GETPOST('price', 'int');                   // prix entré par l'utilisateur
     $qte = (int)GETPOST('qty');                         // quantité demandée
-    $unitprice = $price/$qte;                           // prix unitaire
-    $tva = (int)GETPOST('tvatx');                       // taux de tva saisi
+    $unitprice = ($qte > 1) ? $price/$qte : $price;     // prix unitaire
+    $tva = GETPOST('tvatx', 'int');                     // taux de tva saisi
     $id_commande = (int)GETPOST('idcmd');               // id de la commande en cours de modification
     
     // si la ref est laissée vide je rempli la ref (ne pas utiliser pour l'instant)
@@ -109,6 +109,9 @@
             ob_clean();
             print json_encode( array('nb' => $nb, 'liste' => $liste));
             
+            break;
+            
+        Default:
             break;
                     
     }
