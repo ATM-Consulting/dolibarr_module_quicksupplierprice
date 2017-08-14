@@ -12,3 +12,6 @@ NewCommand = (A new command will be created for this supplier for this product)
 CommandLineAdded = The line has been added to this command
 validPrice = The price you've entered
 AddedToThis = (will be added to this command)
+
+NoLinePrice = No Product price selected
+NoQte = the quantity can't be null

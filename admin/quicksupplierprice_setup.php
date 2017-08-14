@@ -133,8 +133,8 @@ print '</td></tr>';
  print '<td align="right" width="300">';
  print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
  print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
- print '<input type="hidden" name="action" value="set_QSPBESTPRICE">';
- print ajax_constantonoff('QSPBESTPRICE');
+ print '<input type="hidden" name="action" value="set_QSP_SEARCH_PRICES">';
+ print ajax_constantonoff('QSP_SEARCH_PRICES');
  print '</form>';
  print '</td></tr>';
 

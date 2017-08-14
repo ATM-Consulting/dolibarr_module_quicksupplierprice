@@ -65,72 +65,84 @@ class Actionsquicksupplierprice
 	    if (in_array('ordersuppliercard', $TContext) || in_array('invoicesuppliercard', $TContext))
 	    {
 	        
-	        if(!empty($_POST)){
-	            global $db, $user, $langs;
-	            $langs->load('quicksupplierprice@quicksupplierprice');
-	            
-	            $action = GETPOST('action');
-	            
-	            if($action == 'selectpriceQSP'){
-	                $ligneprix = GETPOST('prix', 'int'); // id de la ligne dans llx_product_fournisseur_price
-	                $qte = GETPOST('qty', 'int');        // quantité à commander
+            global $db, $user, $langs;
+            $langs->load('quicksupplierprice@quicksupplierprice');
+            
+            $action = GETPOST('action');
+            
+            if($action == 'selectpriceQSP'){
+                $ligneprix = GETPOST('prix', 'int'); // id de la ligne dans llx_product_fournisseur_price
+                $qte = GETPOST('qty', 'int');        // quantité à commander
+                $err = 0;
+                
+                if(empty($ligneprix)){
+                    $err++;
+                    setEventMessage($langs->trans('NoLinePrice'), 'errors');
+                }
+                if(empty($qte) || $qte == 0){
+                    $err++;
+                    setEventMessage($langs->trans('NoQte'), 'errors');
+                }
+                
+                if($err){
+                    return 1;
+                }
+                
+                // récupère la ligne prix fournisseur avec son id
+                $pfp = new ProductFournisseur($db);
+                $pfp->fetch_product_fournisseur_price($ligneprix);
+                
+                // récupère le produit pour connaitre son type
+                $product = new Product($db);
+                $product->fetch($pfp->id);
+                
+                // si le fournisseur de la commande en cours est le même que la ligne produit sélectionnée, on ajoute une ligne à cette commande
+                if($object->fourn_id == $pfp->fourn_id){ 
+                    $object->addline(
+                        ''
+                        , $pfp->price
+                        , $qte
+                        ,$pfp->fourn_tva_tx
+                        ,0
+                        ,0
+                        ,$pfp->fk_product
+                        ,$pfp->id
+                        ,$pfp->ref_supplier
+                        ,$pfp->fourn_remise_percent
+                        ,'HT'
+                        ,''
+                        ,$product->type
+                        );
+                    
+                    // regénérer le pdf pour que la ligne ajoutée apparaisse
+                    $result=$object->generateDocument($object->modelpdf, $langs, $hidedetails, $hidedesc, $hideref);
+                    if ($result < 0) dol_print_error($db,$result);
+                    
+                    setEventMessage($langs->trans('CommandLineAdded'), 'mesgs');
+                    
+                } else {
+                    // crée une nouvelle commande fournisseur avec comme fournisseur celui de la ligne choisie
+	                $commande = new CommandeFournisseur($db);
+	                $commande->entity = 1;
+	                $commande->socid = $pfp->fourn_id;
 	                
-	                // récupère la ligne prix fournisseur avec son id
-	                $pfp = new ProductFournisseur($db);
-	                $pfp->fetch_product_fournisseur_price($ligneprix);
+                    // crée la ligne produit dans cette commande
+	                $commande->lines[0] = new CommandeFournisseurLigne($db);
+	                	                
+	                $commande->lines[0]->qty = $qte;
+	                $commande->lines[0]->tva_tx = $pfp->fourn_tva_tx;
+	                $commande->lines[0]->fk_product = $pfp->fk_product;
+	                $commande->lines[0]->ref_fourn = $pfp->ref_supplier;   // $this->lines[$i]->ref_fourn comes from field ref into table of lines. Value may ba a ref that does not exists anymore, so we first try with value of product
+	                $commande->lines[0]->remise_percent = $pfp->fourn_remise_percent;
+	                $commande->lines[0]->product_type = $product->type;
+	                $commande->lines[0]->info_bits = 0;
+	                $commande->lines[0]->fk_unit = $pfp->fk_unit;
 	                
-	                // récupère le produit pour connaitre son type
-	                $product = new Product($db);
-	                $product->fetch($pfp->id);
-	                
-	                // si le fournisseur de la commande en cours est le même que la ligne produit sélectionnée, on ajoute une ligne à cette commande
-	                if($object->fourn_id == $pfp->fourn_id){ 
-	                    $object->addline(
-	                        ''
-	                        , $pfp->price
-	                        , $qte
-	                        ,$pfp->fourn_tva_tx
-	                        ,0
-	                        ,0
-	                        ,$pfp->fk_product
-	                        ,$pfp->id
-	                        ,$pfp->ref_supplier
-	                        ,$pfp->fourn_remise_percent
-	                        ,'HT'
-	                        ,''
-	                        ,$product->type
-	                        );
-	                    
-	                    // regénérer le pdf pour que la ligne ajoutée apparaisse
-	                    $result=$object->generateDocument($object->modelpdf, $langs, $hidedetails, $hidedesc, $hideref);
-	                    if ($result < 0) dol_print_error($db,$result);
-	                    
-	                    setEventMessage($langs->trans('CommandLineAdded'), 'mesgs');
-	                    
-	                } else {
-	                    // crée une nouvelle commande fournisseur avec comme fournisseur celui de la ligne choisie
-    	                $commande = new CommandeFournisseur($db);
-    	                $commande->entity = 1;
-    	                $commande->socid = $pfp->fourn_id;
-    	                
-                        // crée la ligne produit dans cette commande
-    	                $commande->lines[0] = new CommandeFournisseurLigne($db);
-    	                	                
-    	                $commande->lines[0]->qty = $qte;
-    	                $commande->lines[0]->tva_tx = $pfp->fourn_tva_tx;
-    	                $commande->lines[0]->fk_product = $pfp->fk_product;
-    	                $commande->lines[0]->ref_fourn = $pfp->ref_supplier;   // $this->lines[$i]->ref_fourn comes from field ref into table of lines. Value may ba a ref that does not exists anymore, so we first try with value of product
-    	                $commande->lines[0]->remise_percent = $pfp->fourn_remise_percent;
-    	                $commande->lines[0]->product_type = $product->type;
-    	                $commande->lines[0]->info_bits = 0;
-    	                $commande->lines[0]->fk_unit = $pfp->fk_unit;
-    	                
-    	                $commande->create($user);
-    	                setEventMessage($langs->trans('NewCommandeGen') . ' ref : ' . $commande->getNomUrl(), 'warnings');
-	                }
-	                
-	            }
-	        }
+	                $commande->create($user);
+	                setEventMessage($langs->trans('NewCommandeGen') . ' ref : ' . $commande->getNomUrl(), 'warnings');
+                }
+                
+            }
 	    }
 	}
 	    
@@ -180,7 +192,7 @@ class Actionsquicksupplierprice
                         } else {
                         	<?php 
                             // on vérifie si la recherche de meilleurs prix est activée
-                        	if(!empty($conf->global->QSPBESTPRICE)){ // si c'est activé, on vérifie
+                        	if(!empty($conf->global->QSP_SEARCH_PRICES)){ // si c'est activé, on vérifie
                         	    ?>
                         	    checkPrice();
                         	    <?php
