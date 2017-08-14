@@ -65,7 +65,7 @@ class Actionsquicksupplierprice
 	    if (in_array('ordersuppliercard', $TContext) || in_array('invoicesuppliercard', $TContext))
 	    {
 	        
-            global $db, $user, $langs;
+            global $db, $user, $langs, $conf;
             $langs->load('quicksupplierprice@quicksupplierprice');
             
             $action = GETPOST('action');
@@ -123,7 +123,7 @@ class Actionsquicksupplierprice
                 } else {
                     // crée une nouvelle commande fournisseur avec comme fournisseur celui de la ligne choisie
 	                $commande = new CommandeFournisseur($db);
-	                $commande->entity = 1;
+	                $commande->entity = $conf->entity;
 	                $commande->socid = $pfp->fourn_id;
 	                
                     // crée la ligne produit dans cette commande
@@ -223,59 +223,41 @@ class Actionsquicksupplierprice
                             ,method:"post"
                             ,dataType:'json'
                         }).done(function(data) {
-
+console.log(data.nb);
                             if(data.nb == 0){ // s'il n'y a pas de prix moins cher, on ajoute la ligne commande et la ligne prix_fourn comme avant
                             	console.log('pas moins cher ailleurs');
                             	updatePrice();
                                                                 
                             } else { // si le produit est moins cher ailleurs, on propose la liste des prix inférieurs
                             	console.log('moins cher ailleurs');
-                            	listPrice();
+                            	listPrice(data);
                             }
                                                    
                         });
                     }
 
-                    // fonction qui renvoie la liste des prix inférieurs au prix saisie dans un popin (#selectfourn)
-                    function listPrice(){
-                    	$.ajax({
-                            url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
-                            ,data:{
-                                put: 'listeprice'
-                                ,idprod:$("#idprod_qsp").val()
-                                ,ref_search:$('#search_idprod_qsp').val()
-                                ,idcmd:<?php echo $object->id; ?>
-                                ,fk_supplier:<?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>
-                                ,price:$("#price_ht_qsp").val()
-                                ,qty:$("#qty_qsp").val()
-                                ,tvatx:$("#tva_tx_qsp").val()
-                                ,ref:$("#ref_qsp").val()
-                            }
-                            ,method:"post"
-                            ,dataType:'json'
-                        }).done(function(data){
-							
-							if($('#selectFourn').length==0) {
-								$('body').append('<div id="selectFourn" title="Sélection du prix"></div>');
+                    // fonction qui ajoute la liste des prix inférieurs au prix saisie dans un popin (#selectfourn)
+                    function listPrice(data){
+                		if($('#selectFourn').length==0) {
+							$('body').append('<div id="selectFourn" title="Sélection du prix"></div>');
+						}
+
+						$('#selectFourn').html(data.liste);
+
+						$('#selectFourn form').submit(function(e){
+							if($('input[name="prix"]:checked').val() == 'saisie'){
+								// correspond au cas ou l'utilisateur valide son prix même s'il en existe des moins chers
+								e.preventDefault();
+								$('#selectFourn').dialog('close');
+								updatePrice(); // on crée le prix
 							}
-
-							$('#selectFourn').html(data.liste);
-
-							$('#selectFourn form').submit(function(e){
-								if($('input[name="prix"]:checked').val() == 'saisie'){
-									// correspond au cas ou l'utilisateur valide son prix même s'il en existe des moins chers
-									e.preventDefault();
-									$('#selectFourn').dialog('close');
-									updatePrice(); // on crée le prix
-								}
-							});
-							
-							$('#selectFourn').dialog({
-								modal:true,
-								width:'80%'
-							});	
-					
-                        });
+						});
+						
+						$('#selectFourn').dialog({
+							modal:true,
+							width:'80%'
+						});	
+					                        
                     }
 
                     // fonction d'ajout d'un prix

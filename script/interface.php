@@ -56,9 +56,12 @@
             break;
             
         case 'checkprice': // vérifie s'il y a des prix unitaire strictement inférieurs et on en renvoie le nombre
+            global $langs;
+            $langs->load('quicksupplierprice@quicksupplierprice');
+            
             ob_start();
             
-            $sql = 'SELECT COUNT(*) as total';
+            $sql = 'SELECT pfp.rowid as product_fourn_price_id, pfp.unitprice as fourn_unitprice, pfp.quantity as fourn_qty, pfp.price as fourn_price, s.nom as fourn_name, s.rowid as fourn_id';
             $sql .= ' FROM ' . MAIN_DB_PREFIX .'product_fournisseur_price as pfp , ' . MAIN_DB_PREFIX .'societe as s';
             $sql .= ' WHERE pfp.entity = 1';
             $sql .= ' AND pfp.fk_soc = s.rowid';
@@ -66,62 +69,47 @@
             $sql .= ' AND pfp.fk_product = '.$id_prod.' AND pfp.unitprice < '.$unitprice;
             
             $res = $db->query($sql);
-            $obj = $db->fetch_object($res);
+            $nb = $db->num_rows($res);
+            
+            $liste = '';
+            if($nb > 0){ // s'il existe des prix plus bas
+                // on génère la liste des prix inférieurs au prix demandé
+                $liste = '<form action="'.dol_buildpath('/fourn/commande/card.php', 1).'?id='. $id_commande .'" method="POST">'."\n";
+                $liste .= '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+                $liste .= '<input type="hidden" name="action" value="selectpriceQSP">';
+                $liste .= '<input type="hidden" name="qty" value="'.$qte.'">';
+                $liste .= '<div><p>Plusieurs prix sont disponibles pour ce produit veuillez valider le prix saisie ou choisir le produit dans la liste</p></div>';
+                $liste .= '<div class="div-table-responsive"><table class="noborder noshadow" width="100%"><thead>';
+                $liste .= '<tr class="liste_titre"><td>Fournisseur</td><td align="right">P.U. HT</td><td align="right">Quantité minimum</td><td align="right">Total HT</td><td width="20%" align="right" style="padding-right: 20px;">Choix</td></tr>';
+                $liste .= '</thead><tbody>';
+                
+                $liste .= '<tr><td><label for="saisie">'.$langs->trans('validPrice').' '.$langs->trans('AddedToThis').'</label></td>';
+                $liste .= '<td align="right"><label for="saisie">' . number_format($unitprice, 2) . '</label></td>';
+                $liste .= '<td align="right"><label for="saisie">' . $qte . '</label></td>';
+                $liste .= '<td align="right"><label for="saisie">' . number_format($price, 2) . '</label></td>';
+                $liste .= '<td align="right" style="padding-right: 20px;"><input id="saisie" type="radio" name="prix" value="saisie" checked></td></tr>';
+                
+                while($obj = $db->fetch_object($res)){
+                    $tooltip = ($fk_soc == $obj->fourn_id) ? $langs->trans('AddedToThis') : $langs->trans('NewCommand');
+                    $liste .= '<tr><td><label for="sel_'.$obj->product_fourn_price_id.'">'. $obj->fourn_name .' '.$tooltip.'</label></td>';
+                    $liste .= '<td align="right"><label for="sel_'.$obj->product_fourn_price_id.'">' . number_format($obj->fourn_unitprice, 2) . '</label></td>';
+                    $liste .= '<td align="right"><label for="sel_'.$obj->product_fourn_price_id.'">' . $obj->fourn_qty . '</label></td>';
+                    $liste .= '<td align="right"><label for="sel_'.$obj->product_fourn_price_id.'">' . number_format($obj->fourn_price, 2) . '</label></td>';
+                    $liste .= '<td align="right" style="padding-right: 20px;"><input id="sel_'.$obj->product_fourn_price_id.'" type="radio" name="prix" value="'.$obj->product_fourn_price_id.'"></td></tr>';
+                }
+                
+                $liste .= '</tbody></table></div>';
+                
+                $liste .= '<div class="center">';
+                $liste .= '<input type="submit" class="button" value="'.$langs->trans("Validate").'">';
+                $liste .= '</div>';
+                $liste .= '</form>';
+            }
                                     
             ob_clean();
-            print json_encode( array('nb' => $obj->total));
+            print json_encode( array('nb' => $nb, 'liste' => $liste));
             
             break;
-            
-        case 'listeprice': // renvoie la liste des prix inférieurs
-            global $langs;
-            $langs->load('quicksupplierprice@quicksupplierprice');
-            
-            ob_start();
-            
-            // on récupère la liste des prix fournisseur pour ce produit
-            $product = new ProductFournisseur($db);
-            $retour = $product->list_product_fournisseur_price($id_prod, 'pfp.unitprice', 'DESC');
-            
-            // on génère la liste des prix inférieurs au prix demandé
-            $liste = '<form action="'.dol_buildpath('/fourn/commande/card.php', 1).'?id='. $id_commande .'" method="POST">'."\n";
-            $liste .= '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
-            $liste .= '<input type="hidden" name="action" value="selectpriceQSP">';
-            $liste .= '<input type="hidden" name="qty" value="'.$qte.'">';
-            $liste .= '<div><p>Plusieurs prix sont disponibles pour ce produit veuillez valider le prix saisie ou choisir le produit dans la liste</p></div>';
-            $liste .= '<div class="div-table-responsive"><table class="noborder noshadow" width="100%"><thead>';
-            $liste .= '<tr class="liste_titre"><td>Fournisseur</td><td align="right">P.U. HT</td><td align="right">Quantité minimum</td><td align="right">Total HT</td><td width="20%" align="right" style="padding-right: 20px;">Choix</td></tr>';
-            $liste .= '</thead><tbody>';
-            
-            $liste .= '<tr><td><label for="saisie">'.$langs->trans('validPrice').' '.$langs->trans('AddedToThis').'</label></td>';
-            $liste .= '<td align="right"><label for="saisie">' . number_format($unitprice, 2) . '</label></td>';
-            $liste .= '<td align="right"><label for="saisie">' . $qte . '</label></td>';
-            $liste .= '<td align="right"><label for="saisie">' . number_format($price, 2) . '</label></td>';
-            $liste .= '<td align="right" style="padding-right: 20px;"><input id="saisie" type="radio" name="prix" value="saisie" checked></td></tr>';
-            
-            foreach ($retour as $prix){
-                if($prix->fourn_unitprice < $unitprice){
-                    $tooltip = ($fk_soc == $prix->fourn_id) ? $langs->trans('AddedToThis') : $langs->trans('NewCommand');
-                    $liste .= '<tr><td><label for="sel_'.$prix->product_fourn_price_id.'">'. $prix->fourn_name .' '.$tooltip.'</label></td>';
-                    $liste .= '<td align="right"><label for="sel_'.$prix->product_fourn_price_id.'">' . number_format($prix->fourn_unitprice, 2) . '</label></td>';
-                    $liste .= '<td align="right"><label for="sel_'.$prix->product_fourn_price_id.'">' . $prix->fourn_qty . '</label></td>';
-                    $liste .= '<td align="right"><label for="sel_'.$prix->product_fourn_price_id.'">' . number_format($prix->fourn_price, 2) . '</label></td>';
-                    $liste .= '<td align="right" style="padding-right: 20px;"><input id="sel_'.$prix->product_fourn_price_id.'" type="radio" name="prix" value="'.$prix->product_fourn_price_id.'"></td></tr>';
-                }
-            }
-            
-            $liste .= '</tbody></table></div>';
-            
-            $liste .= '<div class="center">';
-            $liste .= '<input type="submit" class="button" value="'.$langs->trans("Save").'">';
-            $liste .= '</div>';
-            $liste .= '</form>';
-            
-            ob_clean();
-            
-            print json_encode(array('liste' => $liste));
-            
-            break;
-        
+                    
     }
 
