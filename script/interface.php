@@ -15,7 +15,7 @@
     $qte = (int)GETPOST('qty');                         // quantité demandée
     $unitprice = ($qte > 1) ? $price/$qte : $price;     // prix unitaire
     $tva = GETPOST('tvatx', 'int');                     // taux de tva saisi
-    $id_commande = (int)GETPOST('idcmd');               // id de la commande en cours de modification
+    $fk_order = (int)GETPOST('fk_order');               // id de la commande en cours de modification
     
     // si la ref est laissée vide je rempli la ref (ne pas utiliser pour l'instant)
     // if($ref == '') $ref = 'FP-'.$fk_soc.'-'.$id_prod.'-'.$price;
@@ -26,7 +26,7 @@
             break;
             
         case 'checkprice': // vérifie s'il y a des prix unitaire strictement inférieurs et on en renvoie le nombre
-            checkprice($id_prod, $unitprice, $id_commande, $qte, $price, $fk_soc);            
+            checkprice($id_prod, $unitprice, $fk_order, $qte, $price, $fk_soc);            
             break;
             
         Default:
@@ -39,13 +39,13 @@
      * 
      * @param $id_prod        id du produit
      * @param $unitprice      prix unitaire
-     * @param $id_commande    id de la commande en cours
+     * @param $fk_order    id de la commande en cours
      * @param $qte            quantité commandée
      * @param $price          total HT
      * @param $fk_soc         id du fournisseur courant
      * 
      */
-    function checkprice($id_prod, $unitprice, $id_commande, $qte, $price, $fk_soc){
+    function checkprice($id_prod, $unitprice, $fk_order, $qte, $price, $fk_soc){
         global $db, $langs;
         $langs->load('quicksupplierprice@quicksupplierprice');
         
@@ -63,7 +63,7 @@
         $liste = '';
         if($nb > 0){ // s'il existe des prix plus bas
             // on génère la liste des prix inférieurs au prix demandé
-            $liste = '<form action="'.dol_buildpath('/fourn/commande/card.php', 1).'?id='. $id_commande .'" method="POST">'."\n";
+            $liste = '<form action="'.dol_buildpath('/fourn/commande/card.php', 1).'?id='. $fk_order .'" method="POST">'."\n";
             $liste .= '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
             $liste .= '<input type="hidden" name="action" value="selectpriceQSP">';
             $liste .= '<input type="hidden" name="qty" value="'.$qte.'">';

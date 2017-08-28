@@ -96,7 +96,7 @@ class modquicksupplierprice extends DolibarrModules
 		$this->dirs = array();
 
 		// Config pages. Put here list of php page, stored into quicksupplierprice/admin directory, to use to setup module.
-		$this->config_page_url = array("quicksupplierprice_about.php@quicksupplierprice");
+		$this->config_page_url = array("quicksupplierprice_setup.php@quicksupplierprice");
 
 		// Dependencies
 		$this->hidden = false;			// A condition to hide module
