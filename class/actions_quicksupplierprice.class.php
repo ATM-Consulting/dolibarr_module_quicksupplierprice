@@ -100,7 +100,7 @@ class Actionsquicksupplierprice
                 if($object->fourn_id == $pfp->fourn_id){ 
                     $object->addline(
                         ''
-                        , $pfp->price
+                    	, $pfp->fourn_price
                         , $qte
                         ,$pfp->fourn_tva_tx
                         ,0
@@ -114,6 +114,8 @@ class Actionsquicksupplierprice
                         ,$product->type
                         );
                     
+                    
+                  
                     // regénérer le pdf pour que la ligne ajoutée apparaisse
                     $result=$object->generateDocument($object->modelpdf, $langs, $hidedetails, $hidedesc, $hideref);
                     if ($result < 0) dol_print_error($db,$result);
@@ -137,7 +139,9 @@ class Actionsquicksupplierprice
 	                $commande->lines[0]->product_type = $product->type;
 	                $commande->lines[0]->info_bits = 0;
 	                $commande->lines[0]->fk_unit = $pfp->fk_unit;
-	                
+	               	$commande->lines[0]->subprice= $pfp->fourn_price;
+	                $commande->lines[0]->price= $pfp->fourn_price;
+	                 
 	                $commande->create($user);
 	                setEventMessage($langs->trans('NewCommandeGen') . ' ref : ' . $commande->getNomUrl(), 'warnings');
                 }
