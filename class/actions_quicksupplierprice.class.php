@@ -139,8 +139,11 @@ class Actionsquicksupplierprice
 	                $commande->lines[0]->product_type = $product->type;
 	                $commande->lines[0]->info_bits = 0;
 	                $commande->lines[0]->fk_unit = $pfp->fk_unit;
-	               	$commande->lines[0]->subprice= $pfp->fourn_price;
-	                $commande->lines[0]->price= $pfp->fourn_price;
+	                
+	                if((float)DOL_VERSION>=6) {
+	                	$commande->lines[0]->subprice= $pfp->fourn_price;
+	                	$commande->lines[0]->price= $pfp->fourn_price;
+	                }
 	                 
 	                $commande->create($user);
 	                setEventMessage($langs->trans('NewCommandeGen') . ' ref : ' . $commande->getNomUrl(), 'warnings');
