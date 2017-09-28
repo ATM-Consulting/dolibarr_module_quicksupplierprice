@@ -100,7 +100,7 @@ class Actionsquicksupplierprice
                 if($object->fourn_id == $pfp->fourn_id){ 
                     $object->addline(
                         ''
-                    	, $pfp->fourn_price
+                    	, (((float)DOL_VERSION>=6)?$pfp->fourn_price:$pfp->price)
                         , $qte
                         ,$pfp->fourn_tva_tx
                         ,0
