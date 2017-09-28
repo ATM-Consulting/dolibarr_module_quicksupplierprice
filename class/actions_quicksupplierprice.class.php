@@ -59,12 +59,99 @@ class Actionsquicksupplierprice
 	 * @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
 	 * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
 	 */
+	function doActions($parameters, &$object, &$action, $hookmanager)
+	{
+	    $TContext = explode(':', $parameters['context']);
+	    if (in_array('ordersuppliercard', $TContext) || in_array('invoicesuppliercard', $TContext))
+	    {
+	        
+            global $db, $user, $langs, $conf;
+            $langs->load('quicksupplierprice@quicksupplierprice');
+            
+            $action = GETPOST('action');
+            
+            if($action == 'selectpriceQSP'){
+                $ligneprix = GETPOST('prix', 'int'); // id de la ligne dans llx_product_fournisseur_price
+                $qte = GETPOST('qty', 'int');        // quantité à commander
+                $err = 0;
+                
+                if(empty($ligneprix)){
+                    $err++;
+                    setEventMessage($langs->trans('NoLinePrice'), 'errors');
+                }
+                if(empty($qte) || $qte == 0){
+                    $err++;
+                    setEventMessage($langs->trans('NoQte'), 'errors');
+                }
+                
+                if($err){
+                    return 1;
+                }
+                
+                // récupère la ligne prix fournisseur avec son id
+                $pfp = new ProductFournisseur($db);
+                $pfp->fetch_product_fournisseur_price($ligneprix);
+                
+                // récupère le produit pour connaitre son type
+                $product = new Product($db);
+                $product->fetch($pfp->id);
+                
+                // si le fournisseur de la commande en cours est le même que la ligne produit sélectionnée, on ajoute une ligne à cette commande
+                if($object->fourn_id == $pfp->fourn_id){ 
+                    $object->addline(
+                        ''
+                        , $pfp->price
+                        , $qte
+                        ,$pfp->fourn_tva_tx
+                        ,0
+                        ,0
+                        ,$pfp->fk_product
+                        ,$pfp->id
+                        ,$pfp->ref_supplier
+                        ,$pfp->fourn_remise_percent
+                        ,'HT'
+                        ,''
+                        ,$product->type
+                        );
+                    
+                    // regénérer le pdf pour que la ligne ajoutée apparaisse
+                    $result=$object->generateDocument($object->modelpdf, $langs, $hidedetails, $hidedesc, $hideref);
+                    if ($result < 0) dol_print_error($db,$result);
+                    
+                    setEventMessage($langs->trans('CommandLineAdded'), 'mesgs');
+                    
+                } else {
+                    // crée une nouvelle commande fournisseur avec comme fournisseur celui de la ligne choisie
+	                $commande = new CommandeFournisseur($db);
+	                $commande->entity = $conf->entity;
+	                $commande->socid = $pfp->fourn_id;
+	                
+                    // crée la ligne produit dans cette commande
+	                $commande->lines[0] = new CommandeFournisseurLigne($db);
+	                	                
+	                $commande->lines[0]->qty = $qte;
+	                $commande->lines[0]->tva_tx = $pfp->fourn_tva_tx;
+	                $commande->lines[0]->fk_product = $pfp->fk_product;
+	                $commande->lines[0]->ref_fourn = $pfp->ref_supplier;   // $this->lines[$i]->ref_fourn comes from field ref into table of lines. Value may ba a ref that does not exists anymore, so we first try with value of product
+	                $commande->lines[0]->remise_percent = $pfp->fourn_remise_percent;
+	                $commande->lines[0]->product_type = $product->type;
+	                $commande->lines[0]->info_bits = 0;
+	                $commande->lines[0]->fk_unit = $pfp->fk_unit;
+	                
+	                $commande->create($user);
+	                setEventMessage($langs->trans('NewCommandeGen') . ' ref : ' . $commande->getNomUrl(), 'warnings');
+                }
+                                
+            }
+	    }
+	}
+	    
 	function formAddObjectLine($parameters, &$object, &$action, $hookmanager)
 	{
 		$TContext = explode(':', $parameters['context']);
 		if (in_array('ordersuppliercard', $TContext) || in_array('invoicesuppliercard', $TContext))
 		{
-		    global $db,$conf,$mysoc;
+		    global $db,$conf,$mysoc,$langs;
             $form=new Form($db);
 
             $seller = new Societe($db);
@@ -94,12 +181,89 @@ class Actionsquicksupplierprice
                 <td align="right">&nbsp;</td>
                 <td colspan="<?php echo $colspan ?>"><input type="button" name="bt_add_qsp" id="bt_add_qsp" value="Créer le prix et ajouter" class="button"/></td>
             </tr>
+			            
             <script type="text/javascript">
                 $(document).ready(function() {
-                    $("#bt_add_qsp").click(function() {
-                        $(this).fadeOut();
 
-                        $.ajax({
+                    $("#bt_add_qsp").click(function() {
+
+                        if($("#idprod_qsp").val() == 0){
+                            alert('Aucun produit sélectionné');
+                        } else {
+                        	<?php 
+                            // on vérifie si la recherche de meilleurs prix est activée
+                        	if(!empty($conf->global->QSP_SEARCH_PRICES)){ // si c'est activé, on vérifie
+                        	    ?>
+                        	    checkPrice();
+                        	    <?php
+                        	} else { // sinon on met à jour immédiatement
+                        	    ?>
+                        	    updatePrice();
+                        	    <?php
+                            }
+                                
+                            ?>
+                        }
+                        
+                    });
+
+                    function checkPrice(){
+                    	$.ajax({ // on check s'il existe un prix plus bas ailleurs
+                            url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
+                            ,data:{
+                                put: 'checkprice'
+                                ,idprod:$("#idprod_qsp").val()
+                                ,ref_search:$('#search_idprod_qsp').val()
+                                ,fk_supplier:<?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>
+                                ,fk_order:<?php echo $object->id ?>
+                                ,price:$("#price_ht_qsp").val()
+                                ,qty:$("#qty_qsp").val()
+                                ,tvatx:$("#tva_tx_qsp").val()
+                                ,ref:$("#ref_qsp").val()
+                            }
+                            ,method:"post"
+                            ,dataType:'json'
+                        }).done(function(data) {
+console.log(data.nb);
+                            if(data.nb == 0){ // s'il n'y a pas de prix moins cher, on ajoute la ligne commande et la ligne prix_fourn comme avant
+                            	console.log('pas moins cher ailleurs');
+                            	updatePrice();
+                                                                
+                            } else { // si le produit est moins cher ailleurs, on propose la liste des prix inférieurs
+                            	console.log('moins cher ailleurs');
+                            	listPrice(data);
+                            }
+                                                   
+                        });
+                    }
+
+                    // fonction qui ajoute la liste des prix inférieurs au prix saisie dans un popin (#selectfourn)
+                    function listPrice(data){
+                		if($('#selectFourn').length==0) {
+							$('body').append('<div id="selectFourn" title="<?php echo $langs->transnoentities('PriceSelection'); ?>"></div>');
+						}
+
+						$('#selectFourn').html(data.liste);
+
+						$('#selectFourn form').submit(function(e){
+							if($('input[name="prix"]:checked').val() == 'saisie'){
+								// correspond au cas ou l'utilisateur valide son prix même s'il en existe des moins chers
+								e.preventDefault();
+								$('#selectFourn').dialog('close');
+								updatePrice(); // on crée le prix
+							}
+						});
+						
+						$('#selectFourn').dialog({
+							modal:true,
+							width:'80%'
+						});	
+					                        
+                    }
+
+                    // fonction d'ajout d'un prix
+                    function updatePrice(){
+                    	$.ajax({
                             url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
                             ,data:{
                                 put:'updateprice'
@@ -114,28 +278,27 @@ class Actionsquicksupplierprice
                             ,method:"post"
                             ,dataType:'json'
                         }).done(function(data) {
-                            console.log(data);
-                            if(data.id>0) {
+
+                            if(data.retour >0) { // si le retour est positif, c'est l'id du prix-produit-fournisseur
 
                                 setforpredef();
 
                                 $("#dp_desc").val( data.dp_desc );
-                                $("#idprodfournprice").replaceWith('<input type="hidden" name="idprodfournprice" id="idprodfournprice" value="'+data.id+'" />' );
+                                $("#idprodfournprice").replaceWith('<input type="hidden" name="idprodfournprice" id="idprodfournprice" value="'+data.retour+'" />' );
 
                                 $("#qty").val($("#qty_qsp").val());
 
-                                $("#addline").click();
+                                $("#addline").click(); 
+                                
                             }
-                            else{
+                            else{ // sinon c'est un code erreur 
                                 alert("Il y a une erreur dans votre saisie : "+data.error);
+                                console.log(data.retour); // correspond au code erreur retourné par la méthode de création de ligne prix
                             }
-
                         });
-                    });
+                    }
 
                 });
-
-
 
 
             </script>
