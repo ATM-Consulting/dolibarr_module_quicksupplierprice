@@ -5,3 +5,15 @@ ATMAbout = Ce module a été développé par <a href="http://www.atm-consulting.
 
 quicksupplierpriceSetup = Configuration du module Prix Fournisseur Rapide
 quicksupplierpriceAbout = A propos du module Prix Fournisseur Rapide
+
+BestPrice = Chercher les prix inférieurs lors de la création de la ligne
+NewCommandeGen = Une nouvelle commande fournisseur a été créée
+
+PriceSelection = Sélection du prix
+NewCommand = (Une nouvelle commande sera créée chez ce fournisseur pour ce produit)
+CommandLineAdded = La ligne a été ajoutée à cette commande
+validPrice = Le prix que vous avez saisi
+AddedToThis = (sera ajouté à cette commande)
+
+NoLinePrice = Aucun prix produit sélectionné
+NoQte = La quantité ne peut être nulle
