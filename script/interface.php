@@ -11,12 +11,12 @@
     $ref_search= GETPOST('ref_search', 'alpha');        // ref du produit demandé
     $ref = GETPOST('ref', 'alpha');                     // ref entrée par l'utilisateur
     $fk_soc = GETPOST('fk_supplier', 'int');            // id du fournisseur
-    $price = GETPOST('price', 'int');                   // prix entré par l'utilisateur
+    $price = price2num(GETPOST('price') );                   // prix entré par l'utilisateur
     $qte = (int)GETPOST('qty');                         // quantité demandée
     $unitprice = ($qte > 1) ? $price/$qte : $price;     // prix unitaire
     $tva = GETPOST('tvatx', 'int');                     // taux de tva saisi
     $fk_order = (int)GETPOST('fk_order');               // id de la commande en cours de modification
-    
+
     // si la ref est laissée vide je rempli la ref (ne pas utiliser pour l'instant)
     // if($ref == '') $ref = 'FP-'.$fk_soc.'-'.$id_prod.'-'.$price;
     
@@ -102,6 +102,7 @@
     
     function upatePrice($id_prod, $fk_soc, $unitprice, $qte, $ref_search, $price, $ref, $tva){
         global $db, $user;
+
         ob_start();
         
         // On vérifie si la ligne de tarif n'existe pas déjà pour ce fournisseur
