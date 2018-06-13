@@ -1,6 +1,7 @@
 <?php
 /* <one line to give the program's name and a brief idea of what it does.>
  * Copyright (C) 2015 ATM Consulting <support@atm-consulting.fr>
+ * Copyright (C) 2018 Nicolas ZABOURI	<info@inovea-conseil.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -166,6 +167,9 @@ class Actionsquicksupplierprice
 
             ?>
             <tr class="liste_titre nodrag nodrop">
+		<?php if (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) { ?>
+                    <td></td>
+                <?php } ?>
                 <td>Ajout nouvelle ligne avec prix à la volée</td>
                 <td align="right">TVA</td>
                 <td align="right">Qté</td>
@@ -174,6 +178,9 @@ class Actionsquicksupplierprice
                 <td colspan="<?php echo $colspan+1 ?>">&nbsp;</td>
             </tr>
             <tr class="impair">
+		<?php if (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) { ?>
+                    <td></td>
+                <?php } ?>
                 <td><?php
                     $form->select_produits(GETPOST('idprod_qsp'), 'idprod_qsp', '', $conf->product->limit_size, 1, -1);
                     ?></td>
