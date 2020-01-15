@@ -11,7 +11,7 @@
     $ref_search= GETPOST('ref_search', 'alpha');        // ref du produit demandé
     $ref = GETPOST('ref', 'alpha');                     // ref entrée par l'utilisateur
     $fk_soc = GETPOST('fk_supplier', 'int');            // id du fournisseur
-    $price = GETPOST('price', 'int');                   // prix entré par l'utilisateur
+    $price = price2num(GETPOST('price') );                   // prix entré par l'utilisateur
     $qte = (int)GETPOST('qty');                         // quantité demandée
     $unitprice = ($qte > 1) ? $price/$qte : $price;     // prix unitaire
     $tvatx = GETPOST('tvatx');                     		// taux de tva saisi
@@ -116,6 +116,7 @@
      */
     function upatePrice($id_prod, $fk_soc, $unitprice, $qte, $ref_search, $price, $ref, $tvatx){
         global $db, $user;
+
         ob_start();
 
         // Clean vat code
