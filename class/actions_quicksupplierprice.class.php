@@ -315,7 +315,7 @@ console.log(data.nb);
 
             </script>
             <?php
-				$objectline = new CommandeFournisseurLigne($db);
+				$objectline = in_array('ordersuppliercard', $TContext) ? new CommandeFournisseurLigne($db) : new SupplierInvoiceLine($db);
 				$extrafieldsline = new ExtraFields($db);
 				$extralabelslines=$extrafieldsline->fetch_name_optionals_label($object->table_element_line);
 				print $objectline->showOptionals($extrafieldsline, 'edit', array('style'=>'', 'colspan'=>6), '', '', empty($conf->global->MAIN_EXTRAFIELDS_IN_ONE_TD)?0:1);
