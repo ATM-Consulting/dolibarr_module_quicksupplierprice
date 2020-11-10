@@ -69,7 +69,7 @@ class Actionsquicksupplierprice
             global $db, $user, $langs, $conf;
             $langs->load('quicksupplierprice@quicksupplierprice');
             
-            $action = GETPOST('action');
+            $action = GETPOST('action','alpha');
             
             if($action == 'selectpriceQSP'){
                 $ligneprix = GETPOST('prix', 'int'); // id de la ligne dans llx_product_fournisseur_price
@@ -182,7 +182,7 @@ class Actionsquicksupplierprice
                     <td></td>
                 <?php } ?>
                 <td><?php
-                    $form->select_produits(GETPOST('idprod_qsp'), 'idprod_qsp', '', $conf->product->limit_size, 1, -1);
+                    $form->select_produits(GETPOST('idprod_qsp','int'), 'idprod_qsp', '', $conf->product->limit_size, 1, -1);
                     ?></td>
                 <td align="right"><?php
                     echo $form->load_tva('tva_tx_qsp',(isset($_POST["tva_tx_qsp"])?$_POST["tva_tx_qsp"]:-1),$seller,$mysoc,0,0,'',false,1);
