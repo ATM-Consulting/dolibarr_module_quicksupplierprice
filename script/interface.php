@@ -7,16 +7,16 @@
     $get = GETPOST('get');
     $put = GETPOST('put');
 
-    $id_prod = GETPOST('idprod','int');                  // id du produit demandé
+    $id_prod = (int)GETPOST('idprod','int');                  // id du produit demandé
     $ref_search= GETPOST('ref_search', 'alpha');        // ref du produit demandé
     $ref = GETPOST('ref', 'alpha');                     // ref entrée par l'utilisateur
     $fk_soc = GETPOST('fk_supplier', 'int');            // id du fournisseur
     $price = price2num(GETPOST('price','int') );                   // prix entré par l'utilisateur
-    $qte = GETPOST('qty','int');                         // quantité demandée
+    $qte = (int)GETPOST('qty','int');                         // quantité demandée
     $unitprice = ($qte > 1) ? $price/$qte : $price;     // prix unitaire
     $tvatx = GETPOST('tvatx','int');                     		// taux de tva saisi
     $tvatx=price2num($tvatx);
-    $fk_order = GETPOST('fk_order','int');               // id de la commande en cours de modification
+    $fk_order = (int)GETPOST('fk_order','int');               // id de la commande en cours de modification
 
     // si la ref est laissée vide je rempli la ref (ne pas utiliser pour l'instant)
     // if($ref == '') $ref = 'FP-'.$fk_soc.'-'.$id_prod.'-'.$price;
