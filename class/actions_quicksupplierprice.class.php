@@ -216,6 +216,11 @@ class Actionsquicksupplierprice
                                 
                             ?>
                         }
+
+                        if($("#options_linked_of1").val() !== 0){
+                        	let secondOFSelectValue = $("#options_linked_of1").val();
+                        	$("#options_linked_of").val(secondOFSelectValue);
+						}
                         
                     });
 
@@ -318,7 +323,7 @@ console.log(data.nb);
 				$objectline = in_array('ordersuppliercard', $TContext) ? new CommandeFournisseurLigne($db) : new SupplierInvoiceLine($db);
 				$extrafieldsline = new ExtraFields($db);
 				$extralabelslines=$extrafieldsline->fetch_name_optionals_label($object->table_element_line);
-				print $objectline->showOptionals($extrafieldsline, 'edit', array('style'=>'', 'colspan'=>6), '', '', empty($conf->global->MAIN_EXTRAFIELDS_IN_ONE_TD)?0:1);
+				print $objectline->showOptionals($extrafieldsline, 'edit', array('style'=>'', 'colspan'=>6), empty($conf->global->MAIN_EXTRAFIELDS_IN_ONE_TD)?'':1);
 		}
 
 		return 0; // or return 1 to replace standard code
