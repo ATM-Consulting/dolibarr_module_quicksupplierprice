@@ -62,8 +62,6 @@ class quicksupplierpricebox extends ModeleBoxes
 
         $this->max = $max;
 
-        //include_once DOL_DOCUMENT_ROOT . "/quicksupplierprice/class/quicksupplierprice.class.php";
-
         $text = $langs->trans("MyBoxDescription", $max);
         $this->info_box_head = array(
             'text' => $text,
@@ -79,10 +77,11 @@ class quicksupplierpricebox extends ModeleBoxes
      *
      * 	@param	array	$head       Array with properties of box title
      * 	@param  array	$contents   Array with properties of box lines
+	 *  @param	int		$nooutput	No print, only return string
      * 	@return	void
      */
-    public function showBox($head = null, $contents = null)
+    public function showBox($head = null, $contents = null, $nooutput = 0)
     {
-        parent::showBox($this->info_box_head, $this->info_box_contents);
+        parent::showBox($this->info_box_head, $this->info_box_contents, $nooutput);
     }
 }
