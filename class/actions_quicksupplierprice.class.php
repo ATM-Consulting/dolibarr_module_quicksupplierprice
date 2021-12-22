@@ -302,7 +302,9 @@ console.log(data.nb);
 
                                 $("#dp_desc").val( data.dp_desc );
                                 $("#idprodfournprice").replaceWith('<input type="hidden" name="idprodfournprice" id="idprodfournprice" value="'+data.retour+'" />' );
-                                $("#price_ht").val( $("#price_ht_qsp").val() / $("#qty_qsp").val() );
+                                if($("#qty_qsp").val() > 0) {
+                                    $("#price_ht").val( $("#price_ht_qsp").val() / $("#qty_qsp").val() );
+                                }
                                 $("#qty").val($("#qty_qsp").val());
 
                                 $("#addline").click(); 
