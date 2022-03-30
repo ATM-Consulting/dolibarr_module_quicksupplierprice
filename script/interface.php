@@ -16,8 +16,7 @@
     $price = price2num(GETPOST('price','int') );                   // prix entré par l'utilisateur
     $qte = (int)GETPOST('qty','int');                         // quantité demandée
     $unitprice = ($qte > 1) ? $price/$qte : $price;     // prix unitaire
-    $tvatx = GETPOST('tvatx','int');                     		// taux de tva saisi
-    $tvatx=price2num($tvatx);
+    $tvatx = GETPOST('tvatx', 'alpha');                     		// taux de tva saisi
     $fk_order = (int)GETPOST('fk_order','int');               // id de la commande en cours de modification
 
     // si la ref est laissée vide je rempli la ref (ne pas utiliser pour l'instant)
