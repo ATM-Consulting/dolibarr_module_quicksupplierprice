@@ -331,4 +331,37 @@ console.log(data.nb);
 		return 0; // or return 1 to replace standard code
 
 	}
+
+	function addMoreActionsButtons($parameters, &$object, &$action, $hookmanager)
+	{
+		$TContext = explode(':', $parameters['context']);
+
+		if (in_array('ordersuppliercard', $TContext) || in_array('invoicesuppliercard', $TContext))
+		{
+			if(version_compare(DOL_VERSION,'13.0.0') > 0)
+			{
+			?>
+			<script>
+				$(document).ready(function(){ 
+					let qsp_tr = $("#search_idprod_qsp").closest("tr");
+					let qsp_title = qsp_tr.prev();
+					let qsp_script = qsp_title.next();
+					let qsp_optionnals = qsp_script.next();
+
+					let afterBlock = "#trlinefordates";
+					if ($(afterBlock).length == 0) afterBlock = ".liste_titre_create";
+					$(afterBlock).after(qsp_optionnals);
+					$(afterBlock).after(qsp_script);
+					$(afterBlock).after(qsp_tr);
+					$(afterBlock).after(qsp_title);
+				});
+				
+			</script>
+			<?php
+			}
+		}
+
+		return 0;
+	}
+
 }
