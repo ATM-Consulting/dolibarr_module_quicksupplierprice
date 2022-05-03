@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- FIX : UX Changes between DOL 13.0 and 14.0 so we pull the qsp form under addline tpl - *02/05/2022* - 1.1.5
 - FIX : tvatx must not be converted to int, because it can have decimals and specific tva code - *30/03/2022* - 1.1.4
 - FIX : Fill the unit price to be used by the addline action of fourn/commande/card.php which has changed between V12 and V13 - *22/12/2021* - 1.1.3
 - FIX : Compatibility V13 - Add token renewal - *18/05/2021* - 1.1.2
