@@ -5,4 +5,5 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- FIX [2022-06-01] Can't create more product prices if multidevise is enable
 - FIX [2020-12-10] Fetch and display the OF select value when link an OF on CF (OF select on Dolibarr form AND OF select on Quicksupplier form)
