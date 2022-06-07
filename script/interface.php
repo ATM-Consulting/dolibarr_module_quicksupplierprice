@@ -152,7 +152,7 @@
              $product->product_fourn_id = $fourn->id;
 
             // La methode update_buyprice() renvoie -1 ou -2 en cas d'erreur ou l'id de l'objet modifié ou créé en cas de réussite
-             $ret=$product->update_buyprice($qte , $price, $user, 'HT', $fourn, 1, $ref, $tvatx, 0, 0, 0, 0, 0, '', array(), $vat_src_code);
+             $ret=$product->update_buyprice($qte , $price, $user, 'HT', $fourn, 1, $ref, $tvatx, 0, 0, 0, 0, 0, '', array(), $vat_src_code, $price);
         }
 
         ob_clean();
