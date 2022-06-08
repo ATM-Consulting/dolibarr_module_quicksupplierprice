@@ -65,17 +65,17 @@ class Actionsquicksupplierprice
 	    $TContext = explode(':', $parameters['context']);
 	    if (in_array('ordersuppliercard', $TContext) || in_array('invoicesuppliercard', $TContext))
 	    {
-	        
+
             global $db, $user, $langs, $conf;
             $langs->load('quicksupplierprice@quicksupplierprice');
-            
+
             $action = GETPOST('action','alpha');
-            
+
             if($action == 'selectpriceQSP'){
                 $ligneprix = GETPOST('prix', 'int'); // id de la ligne dans llx_product_fournisseur_price
                 $qte = GETPOST('qty', 'int');        // quantité à commander
                 $err = 0;
-                
+
                 if(empty($ligneprix)){
                     $err++;
                     setEventMessage($langs->trans('NoLinePrice'), 'errors');
@@ -84,21 +84,21 @@ class Actionsquicksupplierprice
                     $err++;
                     setEventMessage($langs->trans('NoQte'), 'errors');
                 }
-                
+
                 if($err){
                     return 1;
                 }
-                
+
                 // récupère la ligne prix fournisseur avec son id
                 $pfp = new ProductFournisseur($db);
                 $pfp->fetch_product_fournisseur_price($ligneprix);
-                
+
                 // récupère le produit pour connaitre son type
                 $product = new Product($db);
                 $product->fetch($pfp->id);
-                
+
                 // si le fournisseur de la commande en cours est le même que la ligne produit sélectionnée, on ajoute une ligne à cette commande
-                if($object->fourn_id == $pfp->fourn_id){ 
+                if($object->fourn_id == $pfp->fourn_id){
                     $object->addline(
                         ''
                     	, (((float)DOL_VERSION>=6)?$pfp->fourn_price:$pfp->price)
@@ -114,22 +114,22 @@ class Actionsquicksupplierprice
                         ,''
                         ,$product->type
                         );
-                    
+
                     // regénérer le pdf pour que la ligne ajoutée apparaisse
                     $result=$object->generateDocument($object->modelpdf, $langs, $hidedetails, $hidedesc, $hideref);
                     if ($result < 0) dol_print_error($db,$result);
-                    
+
                     setEventMessage($langs->trans('CommandLineAdded'), 'mesgs');
-                    
+
                 } else {
                     // crée une nouvelle commande fournisseur avec comme fournisseur celui de la ligne choisie
 	                $commande = new CommandeFournisseur($db);
 	                $commande->entity = $conf->entity;
 	                $commande->socid = $pfp->fourn_id;
-	                
+
                     // crée la ligne produit dans cette commande
 	                $commande->lines[0] = new CommandeFournisseurLigne($db);
-	                	                
+
 	                $commande->lines[0]->qty = $qte;
 	                $commande->lines[0]->tva_tx = $pfp->fourn_tva_tx;
 	                $commande->lines[0]->fk_product = $pfp->fk_product;
@@ -143,15 +143,15 @@ class Actionsquicksupplierprice
 	                	$commande->lines[0]->subprice= $pfp->fourn_price;
 	                	$commande->lines[0]->price= $pfp->fourn_price;
 	                }
-	                
+
 	                $commande->create($user);
 	                setEventMessage($langs->trans('NewCommandeGen') . ' ref : ' . $commande->getNomUrl(), 'warnings');
                 }
-                                
+
             }
 	    }
 	}
-	    
+
 	function formAddObjectLine($parameters, &$object, &$action, $hookmanager)
 	{
 		$TContext = explode(':', $parameters['context']);
@@ -193,7 +193,7 @@ class Actionsquicksupplierprice
                 <td align="right">&nbsp;</td>
                 <td colspan="<?php echo $colspan ?>"><input type="button" name="bt_add_qsp" id="bt_add_qsp" value="Créer le prix et ajouter" class="button"/></td>
             </tr>
-			            
+
             <script type="text/javascript">
                 $(document).ready(function() {
 
@@ -202,7 +202,7 @@ class Actionsquicksupplierprice
                         if($("#idprod_qsp").val() == 0){
                             alert('Aucun produit sélectionné');
                         } else {
-                        	<?php 
+                        	<?php
                             // on vérifie si la recherche de meilleurs prix est activée
                         	if(!empty($conf->global->QSP_SEARCH_PRICES)){ // si c'est activé, on vérifie
                         	    ?>
@@ -213,7 +213,7 @@ class Actionsquicksupplierprice
                         	    updatePrice();
                         	    <?php
                             }
-                                
+
                             ?>
                         }
 
@@ -221,7 +221,7 @@ class Actionsquicksupplierprice
                         	let secondOFSelectValue = $("#options_linked_of1").val();
                         	$("#options_linked_of").val(secondOFSelectValue);
 						}
-                        
+
                     });
 
                     function checkPrice(){
@@ -245,12 +245,12 @@ console.log(data.nb);
                             if(data.nb == 0){ // s'il n'y a pas de prix moins cher, on ajoute la ligne commande et la ligne prix_fourn comme avant
                             	console.log('pas moins cher ailleurs');
                             	updatePrice();
-                                                                
+
                             } else { // si le produit est moins cher ailleurs, on propose la liste des prix inférieurs
                             	console.log('moins cher ailleurs');
                             	listPrice(data);
                             }
-                                                   
+
                         });
                     }
 
@@ -270,12 +270,12 @@ console.log(data.nb);
 								updatePrice(); // on crée le prix
 							}
 						});
-						
+
 						$('#selectFourn').dialog({
 							modal:true,
 							width:'80%'
-						});	
-					                        
+						});
+
                     }
 
                     // fonction d'ajout d'un prix
@@ -307,10 +307,10 @@ console.log(data.nb);
                                 }
                                 $("#qty").val($("#qty_qsp").val());
 
-                                $("#addline").click(); 
-                                
+                                $("#addline").click();
+
                             }
-                            else{ // sinon c'est un code erreur 
+                            else{ // sinon c'est un code erreur
                                 alert("Il y a une erreur dans votre saisie : "+data.error);
                                 console.log(data.retour); // correspond au code erreur retourné par la méthode de création de ligne prix
                             }
