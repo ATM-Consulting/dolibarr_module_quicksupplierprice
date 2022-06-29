@@ -118,6 +118,11 @@
     function upatePrice($id_prod, $fk_soc, $unitprice, $qte, $ref_search, $price, $ref, $tvatx){
         global $db, $user;
 
+		if ($price === '' || $unitprice === '') {
+			print json_encode(array('retour' => 0, 'error' => 'prix non renseigné'));
+			return;
+		}
+
         ob_start();
 
         // Clean vat code
@@ -128,16 +133,21 @@
         }
 
         // On vérifie si la ligne de tarif n'existe pas déjà pour ce fournisseur
-        $sql = "SELECT rowid FROM ".MAIN_DB_PREFIX."product_fournisseur_price WHERE fk_product=" . $id_prod;
-        $sql .= " AND fk_soc=" . $fk_soc;
-        $sql .= " AND unitprice=" . $unitprice;
-        $sql .= " AND quantity=" . $qte;
+		$sql = 'SELECT rowid FROM ' . MAIN_DB_PREFIX . 'product_fournisseur_price'
+			. ' WHERE fk_product=' . intval($id_prod)
+			. ' AND fk_soc=' . intval($fk_soc)
+			. ' AND unitprice=' . floatval($unitprice)
+			. ' AND quantity=' . intval($qte);
         if (!empty($vat_src_code)) {
-        	$sql .= " AND default_vat_code='" . $vat_src_code."'";
+        	$sql .= ' AND default_vat_code="' . $db->escape($vat_src_code).'"';
         }
 
 
         $resq = $db->query($sql);
+		if (!$resq) {
+			print json_encode(array('retour' => 0, 'error' => $db->lasterror()));
+			return;
+		}
 
         if($resq->num_rows !== 0){ // s'il existe, on renvoie l'id de cet ligne prix
             $obj = $db->fetch_object($resq);
