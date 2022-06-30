@@ -52,6 +52,8 @@
         global $db, $langs;
         $langs->load('quicksupplierprice@quicksupplierprice');
 
+        $newToken = function_exists('newToken') ? newToken() : $_SESSION['newtoken'];
+
         ob_start();
         $sql = 'SELECT pfp.rowid as product_fourn_price_id, pfp.unitprice as fourn_unitprice, pfp.quantity as fourn_qty, pfp.price as fourn_price, s.nom as fourn_name, s.rowid as fourn_id';
         $sql .= ' FROM ' . MAIN_DB_PREFIX .'product_fournisseur_price as pfp , ' . MAIN_DB_PREFIX .'societe as s';
@@ -67,7 +69,7 @@
         if($nb > 0){ // s'il existe des prix plus bas
             // on génère la liste des prix inférieurs au prix demandé
             $liste = '<form action="'.dol_buildpath('/fourn/commande/card.php', 1).'?id='. $fk_order .'" method="POST">'."\n";
-            $liste .= '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+            $liste .= '<input type="hidden" name="token" value="'.$newToken.'">';
             $liste .= '<input type="hidden" name="action" value="selectpriceQSP">';
             $liste .= '<input type="hidden" name="qty" value="'.$qte.'">';
             $liste .= '<input type="hidden" name="tvatx" value="'.$tvatx.'">';
