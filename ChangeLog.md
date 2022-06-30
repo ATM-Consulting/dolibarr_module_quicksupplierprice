@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- FIX: Compatibility V16 - token, _update trigger and family - *30/06/2022* - 1.1.7
 - FIX : Can't create more product prices if multidevise is enable - *01/06/2022* - 1.1.6
 - FIX : UX Changes between DOL 13.0 and 14.0 so we pull the qsp form under addline tpl - *02/05/2022* - 1.1.5
 - FIX : tvatx must not be converted to int, because it can have decimals and specific tva code - *30/03/2022* - 1.1.4

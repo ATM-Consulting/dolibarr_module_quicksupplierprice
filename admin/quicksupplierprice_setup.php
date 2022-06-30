@@ -35,6 +35,8 @@ require_once '../lib/quicksupplierprice.lib.php';
 // Translations
 $langs->load("quicksupplierprice@quicksupplierprice");
 
+$newToken = function_exists('newToken') ? newToken() : $_SESSION['newtoken'];
+
 // Access control
 if (! $user->admin) {
     accessforbidden();
@@ -117,7 +119,7 @@ print '<td>'.$langs->trans("ParamLabel").'</td>';
 print '<td align="center" width="20">&nbsp;</td>';
 print '<td align="right" width="300">';
 print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
-print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+print '<input type="hidden" name="token" value="'.$newToken.'">';
 print '<input type="hidden" name="action" value="set_CONSTNAME">';
 print $form->selectyesno("CONSTNAME",$conf->global->CONSTNAME,1);
 print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
@@ -132,7 +134,7 @@ print '</td></tr>';
  print '<td align="center" width="20">&nbsp;</td>';
  print '<td align="right" width="300">';
  print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
- print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+ print '<input type="hidden" name="token" value="'.$newToken.'">';
  print '<input type="hidden" name="action" value="set_QSP_SEARCH_PRICES">';
  print ajax_constantonoff('QSP_SEARCH_PRICES');
  print '</form>';
