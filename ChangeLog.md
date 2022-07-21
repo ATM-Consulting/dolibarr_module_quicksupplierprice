@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- FIX : `Interface.php` has fatal errors (invisible to user) due to SQL
+  injection of empty input values - *29/06/2022* - 1.1.8
 - FIX: Compatibility V16 - token, _update trigger and family - *30/06/2022* - 1.1.7
 - FIX : Can't create more product prices if multidevise is enable - *01/06/2022* - 1.1.6
 - FIX : UX Changes between DOL 13.0 and 14.0 so we pull the qsp form under addline tpl - *02/05/2022* - 1.1.5
