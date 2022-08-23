@@ -291,6 +291,7 @@ console.log(data.nb);
                                 ,qty:$("#qty_qsp").val()
                                 ,tvatx:$("#tva_tx_qsp").val()
                                 ,ref:$("#ref_qsp").val()
+                                ,token:$("input[name='token']").val()
                             }
                             ,method:"post"
                             ,dataType:'json'
