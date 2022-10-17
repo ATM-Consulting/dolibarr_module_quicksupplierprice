@@ -3,11 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## Version 1.0
 
-
-
 ### Changed
 
-- FIX : missing icon - *17/10/2022* - 1.1.9 
+- FIX : Missing icon - *17/10/2022* - 1.1.10 
+- FIX : PHP 8 - *19/08/2022* - 1.1.9
 - FIX : `Interface.php` has fatal errors (invisible to user) due to SQL
   injection of empty input values - *29/06/2022* - 1.1.8
 - FIX: Compatibility V16 - token, _update trigger and family - *30/06/2022* - 1.1.7
