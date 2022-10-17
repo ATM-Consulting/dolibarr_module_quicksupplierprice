@@ -58,15 +58,16 @@ class modquicksupplierprice extends DolibarrModules
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Description of module quicksupplierprice";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
-		$this->version = '1.1.8';
+		$this->version = '1.1.10';
 		// Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
 		// Where to store the module in setup page (0=common,1=interface,2=others,3=very specific)
 		$this->special = 0;
+		$this->editor_name = 'ATM Consulting';
 		// Name of image file used for this module.
 		// If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
 		// If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
-		$this->picto='quicksupplierprice@quicksupplierprice';
+		$this->picto='quicksupplierprice.svg@quicksupplierprice';
 
 		// Defined all module parts (triggers, login, substitutions, menus, css, etc...)
 		// for default path (eg: /quicksupplierprice/core/xxxxx) (0=disable, 1=enable)

@@ -49,7 +49,7 @@ function quicksupplierpriceAdminPrepareHead()
     //$this->tabs = array(
     //	'entity:-tabname:Title:@quicksupplierprice:/quicksupplierprice/mypage.php?id=__ID__'
     //); // to remove a tab
-    complete_head_from_modules($conf, $langs, $object, $head, $h, 'quicksupplierprice');
+    complete_head_from_modules($conf, $langs, new stdClass(), $head, $h, 'quicksupplierprice');
 
     return $head;
 }
