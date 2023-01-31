@@ -1,10 +1,13 @@
 <?php
 
-	if (! defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL','1'); // Disables token renewal
+	if (!defined("NOCSRFCHECK")) define('NOCSRFCHECK', 1);
+	if (!defined("NOTOKENRENEWAL")) define('NOTOKENRENEWAL', 1);  // Disables token renewal
 
     require("../config.php");
+
     dol_include_once('/product/class/product.class.php');
     dol_include_once('/fourn/class/fournisseur.product.class.php');
+
 
     $get = GETPOST('get');
     $put = GETPOST('put');
@@ -24,7 +27,7 @@
 
     switch($put){
         case 'updateprice': // renvoie l'id d'une ligne produit
-        	upatePrice($id_prod, $fk_soc, $unitprice, $qte, $ref_search, $price, $ref, $tvatx);
+			upatePrice($id_prod, $fk_soc, $unitprice, $qte, $ref_search, $price, $ref, $tvatx);
             break;
 
         case 'checkprice': // vérifie s'il y a des prix unitaire strictement inférieurs et on en renvoie le nombre
