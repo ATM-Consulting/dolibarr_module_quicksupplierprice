@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- FIX : Compatibility v17 / PHP 8 - interface.php add NOCSRFCHECK - *31/01/2023* - 1.1.11
 - FIX : Missing icon - *17/10/2022* - 1.1.10 
 - FIX : PHP 8 - *19/08/2022* - 1.1.9
 - FIX : `Interface.php` has fatal errors (invisible to user) due to SQL
