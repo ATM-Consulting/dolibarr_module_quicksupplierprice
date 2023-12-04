@@ -168,7 +168,7 @@ class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHook
 
             ?>
             <tr class="liste_titre nodrag nodrop">
-		<?php if (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) { ?>
+		<?php if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) { ?>
                     <td></td>
                 <?php } ?>
                 <td>Ajout nouvelle ligne avec prix à la volée</td>
@@ -179,7 +179,7 @@ class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHook
                 <td colspan="<?php echo $colspan+1 ?>">&nbsp;</td>
             </tr>
             <tr class="impair">
-		<?php if (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) { ?>
+		<?php if (getDolGlobalString('MAIN_VIEW_LINE_NUMBER')) { ?>
                     <td></td>
                 <?php } ?>
                 <td><?php
@@ -205,14 +205,14 @@ class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHook
                         } else {
                         	<?php
                             // on vérifie si la recherche de meilleurs prix est activée
-                        	if(!empty($conf->global->QSP_SEARCH_PRICES)){ // si c'est activé, on vérifie
+                        	if(getDolGlobalString('QSP_SEARCH_PRICES')){ // si c'est activé, on vérifie
                         	    ?>
                         	    checkPrice();
-                        	    <?php
+<?php
                         	} else { // sinon on met à jour immédiatement
                         	    ?>
                         	    updatePrice();
-                        	    <?php
+<?php
                             }
 
                             ?>
@@ -327,7 +327,7 @@ console.log(data.nb);
 				$objectline = in_array('ordersuppliercard', $TContext) ? new CommandeFournisseurLigne($db) : new SupplierInvoiceLine($db);
 				$extrafieldsline = new ExtraFields($db);
 				$extralabelslines=$extrafieldsline->fetch_name_optionals_label($object->table_element_line);
-				print $objectline->showOptionals($extrafieldsline, 'edit', array('style'=>'', 'colspan'=>6), empty($conf->global->MAIN_EXTRAFIELDS_IN_ONE_TD)?'':1);
+				print $objectline->showOptionals($extrafieldsline, 'edit', array('style'=>'', 'colspan'=>6), !getDolGlobalString('MAIN_EXTRAFIELDS_IN_ONE_TD')?'':1);
 		}
 
 		return 0; // or return 1 to replace standard code
