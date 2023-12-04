@@ -27,7 +27,8 @@
 /**
  * Class Actionsquicksupplierprice
  */
-class Actionsquicksupplierprice
+require_once __DIR__ . '/../backport/v19/core/class/commonhookactions.class.php';
+class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHookActions
 {
 	/**
 	 * @var array Hook results. Propagated to $hookmanager->resArray for later reuse
