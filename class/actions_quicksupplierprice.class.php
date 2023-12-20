@@ -27,7 +27,8 @@
 /**
  * Class Actionsquicksupplierprice
  */
-class Actionsquicksupplierprice
+require_once __DIR__ . '/../backport/v19/core/class/commonhookactions.class.php';
+class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHookActions
 {
 	/**
 	 * @var array Hook results. Propagated to $hookmanager->resArray for later reuse
@@ -167,7 +168,7 @@ class Actionsquicksupplierprice
 
             ?>
             <tr class="liste_titre nodrag nodrop">
-		<?php if (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) { ?>
+		<?php if (getDolGlobalInt('MAIN_VIEW_LINE_NUMBER')) { ?>
                     <td></td>
                 <?php } ?>
                 <td>Ajout nouvelle ligne avec prix à la volée</td>
@@ -178,7 +179,7 @@ class Actionsquicksupplierprice
                 <td colspan="<?php echo $colspan+1 ?>">&nbsp;</td>
             </tr>
             <tr class="impair">
-		<?php if (!empty($conf->global->MAIN_VIEW_LINE_NUMBER)) { ?>
+		<?php if (getDolGlobalInt('MAIN_VIEW_LINE_NUMBER')) { ?>
                     <td></td>
                 <?php } ?>
                 <td><?php
@@ -204,14 +205,14 @@ class Actionsquicksupplierprice
                         } else {
                         	<?php
                             // on vérifie si la recherche de meilleurs prix est activée
-                        	if(!empty($conf->global->QSP_SEARCH_PRICES)){ // si c'est activé, on vérifie
+                        	if(getDolGlobalInt('QSP_SEARCH_PRICES')){ // si c'est activé, on vérifie
                         	    ?>
                         	    checkPrice();
-                        	    <?php
+<?php
                         	} else { // sinon on met à jour immédiatement
                         	    ?>
                         	    updatePrice();
-                        	    <?php
+<?php
                             }
 
                             ?>
@@ -326,7 +327,7 @@ console.log(data.nb);
 				$objectline = in_array('ordersuppliercard', $TContext) ? new CommandeFournisseurLigne($db) : new SupplierInvoiceLine($db);
 				$extrafieldsline = new ExtraFields($db);
 				$extralabelslines=$extrafieldsline->fetch_name_optionals_label($object->table_element_line);
-				print $objectline->showOptionals($extrafieldsline, 'edit', array('style'=>'', 'colspan'=>6), empty($conf->global->MAIN_EXTRAFIELDS_IN_ONE_TD)?'':1);
+				print $objectline->showOptionals($extrafieldsline, 'edit', array('style'=>'', 'colspan'=>6), !getDolGlobalInt('MAIN_EXTRAFIELDS_IN_ONE_TD')?'':1);
 		}
 
 		return 0; // or return 1 to replace standard code
