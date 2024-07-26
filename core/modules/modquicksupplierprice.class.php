@@ -148,7 +148,7 @@ class modquicksupplierprice extends DolibarrModules
         $this->tabs = array();
 
         // Dictionaries
-		if (isModEnabled('quicksupplierprice'))
+		if (! isModEnabled('quicksupplierprice'))
         {
         	$conf->quicksupplierprice=new stdClass();
         	$conf->quicksupplierprice->enabled=0;
