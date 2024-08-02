@@ -2,17 +2,16 @@
 All notable changes to this project will be documented in this file.
 
 ### UNRELEASED
+
+## Release 1.4
 - NEW : COMPAT V20 - *25/07/2024* - 1.4.0
 
-
 ## Release 1.3
-
 - NEW : TachATM + Page About *10/01/2024* - 1.3.0
 - NEW :   Changed Dolibarr compatibility range to 12 min - 19 max   	- *04/12/2023* - 1.2.0
           Changed PHP compatibility range to 7.0 min - 8.2 max		- *04/12/2023* - 1.2.0
 
 ## Release 1.0
-
 - FIX : Compatibility v17 / PHP 8 - interface.php add NOCSRFCHECK - *31/01/2023* - 1.1.11
 - FIX : Missing icon - *17/10/2022* - 1.1.10 
 - FIX : PHP 8 - *19/08/2022* - 1.1.9
