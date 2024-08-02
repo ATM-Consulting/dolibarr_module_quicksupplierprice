@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ## Release 1.3
 - NEW : TachATM + Page About *10/01/2024* - 1.3.0
+
+## Release 1.2
 - NEW :   Changed Dolibarr compatibility range to 12 min - 19 max   	- *04/12/2023* - 1.2.0
           Changed PHP compatibility range to 7.0 min - 8.2 max		- *04/12/2023* - 1.2.0
 
