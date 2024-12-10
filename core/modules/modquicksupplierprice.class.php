@@ -155,7 +155,7 @@ class modquicksupplierprice extends DolibarrModules
         }
 		$this->dictionaries=array();
         /* Example:
-        if (! isset($conf->global->quicksupplierprice)) $conf->quicksupplierprice->enabled=0;	// This is to avoid warnings
+        if (! isModEnabled("quicksupplierprice")) $conf->quicksupplierprice->enabled=0;	// This is to avoid warnings
         $this->dictionaries=array(
             'langs'=>'mylangfile@quicksupplierprice',
             'tabname'=>array(MAIN_DB_PREFIX."table1",MAIN_DB_PREFIX."table2",MAIN_DB_PREFIX."table3"),		// List of tables we want to see into dictonnary editor
