@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 ### UNRELEASED
 
 ## Release 1.4
+- FIX : Dolibarr compatibility V21 - *09/12/2024* - 1.4.1  
+  Changed Dolibarr compatibility range to 17 min - 21 max  
+  Change PHP compatibility range to 7.0 min - 8.2 max
 - NEW : COMPAT V20 - *25/07/2024* - 1.4.0
 
 ## Release 1.3
