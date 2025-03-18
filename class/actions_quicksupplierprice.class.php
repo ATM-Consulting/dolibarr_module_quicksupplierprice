@@ -196,133 +196,153 @@ class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHook
             </tr>
 
             <script type="text/javascript">
-                $(document).ready(function() {
+				$(document).ready(function() {
 
-                    $("#bt_add_qsp").click(function() {
-
-                        if($("#idprod_qsp").val() == 0){
-                            alert('Aucun produit sélectionné');
-                        } else {
-                        	<?php
-                            // on vérifie si la recherche de meilleurs prix est activée
-                        	if(getDolGlobalInt('QSP_SEARCH_PRICES')){ // si c'est activé, on vérifie
-                        	    ?>
-                        	    checkPrice();
-<?php
-                        	} else { // sinon on met à jour immédiatement
-                        	    ?>
-                        	    updatePrice();
-<?php
-                            }
-
-                            ?>
-                        }
-
-                        if($("#options_linked_of1").val() !== 0){
-                        	let secondOFSelectValue = $("#options_linked_of1").val();
-                        	$("#options_linked_of").val(secondOFSelectValue);
+					// Fonction qui gère l'action sur clic du bouton
+					$("#bt_add_qsp").click(function() {
+						// Vérifie si un produit est sélectionné
+						if($("#idprod_qsp").val() == 0){
+							alert('Aucun produit sélectionné');
+						} else {
+							<?php
+							// Vérifie si la recherche de meilleurs prix est activée
+							if(getDolGlobalInt('QSP_SEARCH_PRICES')) { ?>
+							checkPrice(); // Si la recherche de prix est activée, on vérifie
+							<?php } else { ?>
+							updatePrice(); // Sinon on met à jour immédiatement
+							<?php } ?>
 						}
 
-                    });
+						// Vérifie si une option liée à un autre ordre de fabrication est sélectionnée
+						if($("#options_linked_of1").val() !== 0){
+							let secondOFSelectValue = $("#options_linked_of1").val();
+							$("#options_linked_of").val(secondOFSelectValue);
+						}
+					});
 
-                    function checkPrice(){
-                    	$.ajax({ // on check s'il existe un prix plus bas ailleurs
-                            url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
-                            ,data:{
-                                put: 'checkprice'
-                                ,idprod:$("#idprod_qsp").val()
-                                ,ref_search:$('#search_idprod_qsp').val()
-                                ,fk_supplier:<?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>
-                                ,fk_order:<?php echo $object->id ?>
-                                ,price:$("#price_ht_qsp").val()
-                                ,qty:$("#qty_qsp").val()
-                                ,tvatx:$("#tva_tx_qsp").val()
-                                ,ref:$("#ref_qsp").val()
-                            }
-                            ,method:"post"
-                            ,dataType:'json'
-                        }).done(function(data) {
-console.log(data.nb);
-                            if(data.nb == 0){ // s'il n'y a pas de prix moins cher, on ajoute la ligne commande et la ligne prix_fourn comme avant
-                            	console.log('pas moins cher ailleurs');
-                            	updatePrice();
+					// Fonction de vérification des prix
+					function checkPrice(){
+						$.ajax({
+							url: "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>",
+							data: {
+								put: 'checkprice',
+								idprod: $("#idprod_qsp").val(),
+								ref_search: $('#search_idprod_qsp').val(),
+								fk_supplier: <?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>,
+								fk_order: <?php echo $object->id ?>,
+								price: $("#price_ht_qsp").val(),
+								qty: $("#qty_qsp").val(),
+								tvatx: $("#tva_tx_qsp").val(),
+								ref: $("#ref_qsp").val()
+							},
+							method: "post",
+							dataType: 'json'
+						}).done(function(data) {
+							console.log(data.nb);
+							if(data.nb == 0) { // Si aucun prix inférieur, on met à jour le prix
+								console.log('Pas moins cher ailleurs');
+								updatePrice();
+							} else { // Si le produit est moins cher ailleurs, on propose la liste des prix inférieurs
+								console.log('Moins cher ailleurs');
+								listPrice(data);
+							}
+						});
+					}
 
-                            } else { // si le produit est moins cher ailleurs, on propose la liste des prix inférieurs
-                            	console.log('moins cher ailleurs');
-                            	listPrice(data);
-                            }
-
-                        });
-                    }
-
-                    // fonction qui ajoute la liste des prix inférieurs au prix saisie dans un popin (#selectfourn)
-                    function listPrice(data){
-                		if($('#selectFourn').length==0) {
+					// Fonction qui affiche la liste des prix inférieurs dans une popin (#selectfourn)
+					function listPrice(data){
+						if($('#selectFourn').length == 0) {
 							$('body').append('<div id="selectFourn" title="<?php echo $langs->transnoentities('PriceSelection'); ?>"></div>');
 						}
 
 						$('#selectFourn').html(data.liste);
 
+						// Gestion de la soumission du formulaire de la popin
 						$('#selectFourn form').submit(function(e){
 							if($('input[name="prix"]:checked').val() == 'saisie'){
-								// correspond au cas ou l'utilisateur valide son prix même s'il en existe des moins chers
+								// Si l'utilisateur choisit de saisir son prix même s'il y en a de moins chers
 								e.preventDefault();
 								$('#selectFourn').dialog('close');
-								updatePrice(); // on crée le prix
+								updatePrice(); // Crée le prix
 							}
 						});
 
 						$('#selectFourn').dialog({
-							modal:true,
-							width:'80%'
+							modal: true,
+							width: '80%'
 						});
+					}
 
-                    }
+					// Fonction qui met à jour le prix
+					function updatePrice(){
+						$.ajax({
+							url: "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>",
+							data: {
+								put: 'updateprice',
+								idprod: $("#idprod_qsp").val(),
+								ref_search: $('#search_idprod_qsp').val(),
+								fk_supplier: <?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>,
+								price: $("#price_ht_qsp").val(),
+								qty: $("#qty_qsp").val(),
+								tvatx: $("#tva_tx_qsp").val(),
+								ref: $("#ref_qsp").val(),
+								token: $("input[name='token']").val(),
+								fk_order: <?php echo $object->id ?>
+							},
+							method: "post",
+							dataType: 'json'
+						}).done(function(data) {
+							if(data.retour > 0) { // Si la réponse est positive, on a un ID du prix-produit-fournisseur
+								setforpredef();
 
-                    // fonction d'ajout d'un prix
-                    function updatePrice(){
-                    	$.ajax({
-                            url : "<?php echo dol_buildpath('/quicksupplierprice/script/interface.php',1) ?>"
-                            ,data:{
-                                put:'updateprice'
-                                ,idprod:$("#idprod_qsp").val()
-                                ,ref_search:$('#search_idprod_qsp').val()
-                                ,fk_supplier:<?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>
-                                ,price:$("#price_ht_qsp").val()
-                                ,qty:$("#qty_qsp").val()
-                                ,tvatx:$("#tva_tx_qsp").val()
-                                ,ref:$("#ref_qsp").val()
-                                ,token:$("input[name='token']").val()
-                            }
-                            ,method:"post"
-                            ,dataType:'json'
-                        }).done(function(data) {
+								$("#dp_desc").val(data.dp_desc);
+								$("#idprodfournprice").replaceWith('<input type="hidden" name="idprodfournprice" id="idprodfournprice" value="'+data.retour+'" />');
+								if($("#qty_qsp").val() > 0) {
+									$("#price_ht").val($("#price_ht_qsp").val() / $("#qty_qsp").val());
+								}
+								$("#qty").val($("#qty_qsp").val());
 
-                            if(data.retour >0) { // si le retour est positif, c'est l'id du prix-produit-fournisseur
+								$("#addline").click(); // Ajoute la ligne à la commande
+							} else { // Erreur dans la saisie
+								alert("Veuillez vérifer votre saisie");
+								console.log(data.retour, data.error); // Code erreur retourné par la méthode de création de ligne prix
+							}
+						});
+					}
 
-                                setforpredef();
+					// Détection de l'appui sur "Entrée" dans le champ #idprod_qsp
+					$("#price_ht_qsp").keydown(function(event) {
+						if (event.key === "Enter") {
+							event.preventDefault(); // Empêche la soumission classique du formulaire
+							// Appelle la même logique que le clic sur le bouton
+							// debugger;
+							console.log($("#idprod_qsp").val());
 
-                                $("#dp_desc").val( data.dp_desc );
-                                $("#idprodfournprice").replaceWith('<input type="hidden" name="idprodfournprice" id="idprodfournprice" value="'+data.retour+'" />' );
-                                if($("#qty_qsp").val() > 0) {
-                                    $("#price_ht").val( $("#price_ht_qsp").val() / $("#qty_qsp").val() );
-                                }
-                                $("#qty").val($("#qty_qsp").val());
+							if($("#idprod_qsp").val() < 0){
+								alert('Aucun produit sélectionné');
+							} else {
+								<?php
+								// Vérifie si la recherche de meilleurs prix est activée
+								if(getDolGlobalInt('QSP_SEARCH_PRICES')) { ?>
+								checkPrice(); // Si la recherche de prix est activée, on vérifie
+								<?php } else { ?>
+								updatePrice(); // Sinon on met à jour immédiatement
+								<?php } ?>
+							}
 
-                                $("#addline").click();
+							// Vérifie si une option liée à un autre ordre de fabrication est sélectionnée
+							if($("#options_linked_of1").val() !== 0){
+								let secondOFSelectValue = $("#options_linked_of1").val();
+								$("#options_linked_of").val(secondOFSelectValue);
+							}
+						}
+					});
 
-                            }
-                            else{ // sinon c'est un code erreur
-                                alert("Il y a une erreur dans votre saisie : "+data.error);
-                                console.log(data.retour); // correspond au code erreur retourné par la méthode de création de ligne prix
-                            }
-                        });
-                    }
-
-                });
+				});
 
 
-            </script>
+
+			</script>
             <?php
 				$objectline = in_array('ordersuppliercard', $TContext) ? new CommandeFournisseurLigne($db) : new SupplierInvoiceLine($db);
 				$extrafieldsline = new ExtraFields($db);
@@ -344,7 +364,7 @@ console.log(data.nb);
 			{
 			?>
 			<script>
-				$(document).ready(function(){ 
+				$(document).ready(function(){
 					let qsp_tr = $("#search_idprod_qsp").closest("tr");
 					let qsp_title = qsp_tr.prev();
 					let qsp_script = qsp_title.next();
@@ -357,7 +377,7 @@ console.log(data.nb);
 					$(afterBlock).after(qsp_tr);
 					$(afterBlock).after(qsp_title);
 				});
-				
+
 			</script>
 			<?php
 			}

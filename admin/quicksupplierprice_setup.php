@@ -45,107 +45,71 @@ if (! $user->admin) {
 // Parameters
 $action = GETPOST('action', 'alpha');
 
+if(! class_exists('FormSetup')) {
+	// une Pr est en cour pour fixer certains elements de la class en V16 (car c'est des fix/new)
+	if(versioncompare(explode('.', DOL_VERSION), array(15)) < 0 && ! class_exists('FormSetup')) {
+		require_once __DIR__.'/../backport/v16/core/class/html.formsetup.class.php';
+	}
+	else {
+		require_once DOL_DOCUMENT_ROOT.'/core/class/html.formsetup.class.php';
+	}
+}
+$formSetup = new FormSetup($db);
+
+$formSetup->newItem('QSP_SEARCH_PRICES')->setAsYesNo();
+
 /*
  * Actions
  */
-if (preg_match('/set_(.*)/',$action,$reg))
-{
-	$code=$reg[1];
-	if (dolibarr_set_const($db, $code, GETPOST($code,'none'), 'chaine', 0, '', $conf->entity) > 0)
-	{
-		header("Location: ".$_SERVER["PHP_SELF"]);
-		exit;
-	}
-	else
-	{
-		dol_print_error($db);
-	}
-}
-	
-if (preg_match('/del_(.*)/',$action,$reg))
-{
-	$code=$reg[1];
-	if (dolibarr_del_const($db, $code, 0) > 0)
-	{
-		Header("Location: ".$_SERVER["PHP_SELF"]);
-		exit;
-	}
-	else
-	{
-		dol_print_error($db);
-	}
+
+if($action == 'update' && ! empty($formSetup) && is_object($formSetup) && ! empty($user->admin)) {
+	$formSetup->saveConfFromPost();
+	header('Location:'.$_SERVER['PHP_SELF']);
+	exit;
 }
 
 /*
  * View
  */
-$page_name = "quicksupplierpriceSetup";
-llxHeader('', $langs->trans($page_name));
+
+$form = new Form($db);
+
+$help_url = '';
+$page_name = 'quicksupplierpriceSetup';
+
+llxHeader('', $langs->trans($page_name), $help_url);
 
 // Subheader
-$linkback = '<a href="' . DOL_URL_ROOT . '/admin/modules.php">'
-    . $langs->trans("BackToModuleList") . '</a>';
-print load_fiche_titre($langs->trans($page_name), $linkback);
+$linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans('BackToModuleList').'</a>';
+
+print load_fiche_titre($langs->trans($page_name), $linkback, 'title_setup');
 
 // Configuration header
 $head = quicksupplierpriceAdminPrepareHead();
-print dol_get_fiche_head(
-    $head,
-    'settings',
-    $langs->trans("Module104750Name"),
-    -1,
-    "quicksupplierprice@quicksupplierprice"
-);
-
+print dol_get_fiche_head($head, 'ndf', $langs->trans($page_name), -1, 'quicksupplierprice.svg@quicksupplierprice');
 
 // Setup page goes here
-$form=new Form($db);
-$var=false;
-print '<table class="noborder" width="100%">';
-print '<tr class="liste_titre">';
-print '<td>'.$langs->trans("Parameters").'</td>'."\n";
-print '<td align="center" width="20">&nbsp;</td>';
-print '<td align="center" width="100">'.$langs->trans("Value").'</td>'."\n";
-/*
-$var=!$var;
-print '<tr '.$bc[$var].'>';
-print '<td colspan="3">Aucun paramétrage n\'est nécessaire pour ce module</td>';
-print '</tr>';
-*/
+echo '<span class="opacitymedium">'.$langs->trans('quickcustomerprice').'</span><br><br>';
 
-/*// Example with a yes / no select
-$var=!$var;
-print '<tr '.$bc[$var].'>';
-print '<td>'.$langs->trans("ParamLabel").'</td>';
-print '<td align="center" width="20">&nbsp;</td>';
-print '<td align="right" width="300">';
-print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
-print '<input type="hidden" name="token" value="'.$newToken.'">';
-print '<input type="hidden" name="action" value="set_CONSTNAME">';
-print $form->selectyesno("CONSTNAME",$conf->global->CONSTNAME,1);
-print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
-print '</form>';
-print '</td></tr>';
-*/
+if($action == 'edit') {
+	print $formSetup->generateOutput(true);
+	print '<br>';
+}
+else {
+	if(! empty($formSetup->items)) {
+		print $formSetup->generateOutput();
 
-// Example with a yes / no select
- $var=!$var;
- print '<tr '.$bc[$var].'>';
- print '<td>'.$langs->trans("BestPrice").'</td>';
- print '<td align="center" width="20">&nbsp;</td>';
- print '<td align="right" width="300">';
- print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
- print '<input type="hidden" name="token" value="'.$newToken.'">';
- print '<input type="hidden" name="action" value="set_QSP_SEARCH_PRICES">';
- print ajax_constantonoff('QSP_SEARCH_PRICES');
- print '</form>';
- print '</td></tr>';
+		print '<div class="tabsAction">';
+		print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?action=edit&token='.newToken().'">'.$langs->trans('Modify').'</a>';
+		print '</div>';
+	}
+	else {
+		print '<br>'.$langs->trans('NothingToSetup');
+	}
+}
 
-
-print '</table>';
-
-
-print dol_get_fiche_end(-1);
+// Page end
+print dol_get_fiche_end();
 
 llxFooter();
 

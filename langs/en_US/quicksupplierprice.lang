@@ -6,7 +6,7 @@ ATMAbout = This module has been developed by <a href="http://www.atm-consulting.
 quicksupplierpriceSetup = quicksupplierprice module setup
 quicksupplierpriceAbout = About quicksupplierprice
 
-BestPrice = Search for lower prices when creating the line
+QSP_SEARCH_PRICES = Search for lower prices when creating the line
 NewCommandeGen = A new command has been created
 
 PriceSelection = Price selection

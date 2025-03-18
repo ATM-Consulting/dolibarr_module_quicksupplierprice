@@ -8,7 +8,6 @@
     dol_include_once('/product/class/product.class.php');
     dol_include_once('/fourn/class/fournisseur.product.class.php');
 
-
     $get = GETPOST('get');
     $put = GETPOST('put');
 
@@ -22,12 +21,12 @@
     $tvatx = GETPOST('tvatx', 'alpha');                     		// taux de tva saisi
     $fk_order = (int)GETPOST('fk_order','int');               // id de la commande en cours de modification
 
+$_POST;
     // si la ref est laissée vide je rempli la ref (ne pas utiliser pour l'instant)
     // if($ref == '') $ref = 'FP-'.$fk_soc.'-'.$id_prod.'-'.$price;
-
     switch($put){
         case 'updateprice': // renvoie l'id d'une ligne produit
-			upatePrice($id_prod, $fk_soc, $unitprice, $qte, $ref_search, $price, $ref, $tvatx);
+			upatePrice($id_prod, $fk_soc, $unitprice, $qte, $ref_search, $price, $ref, $tvatx, $fk_order);
             break;
 
         case 'checkprice': // vérifie s'il y a des prix unitaire strictement inférieurs et on en renvoie le nombre
@@ -120,7 +119,7 @@
      * @param unknown $ref
      * @param unknown $tvatx
      */
-    function upatePrice($id_prod, $fk_soc, $unitprice, $qte, $ref_search, $price, $ref, $tvatx){
+    function upatePrice($id_prod, $fk_soc, $unitprice, $qte, $ref_search, $price, $ref, $tvatx, $fk_order){
         global $db, $user;
 
 		if ($price === '' || $unitprice === '') {
@@ -138,15 +137,18 @@
         }
 
         // On vérifie si la ligne de tarif n'existe pas déjà pour ce fournisseur
-		$sql = 'SELECT rowid FROM ' . MAIN_DB_PREFIX . 'product_fournisseur_price'
+		$sql = 'SELECT rowid FROM ' . $db->prefix() . 'product_fournisseur_price'
 			. ' WHERE fk_product=' . intval($id_prod)
 			. ' AND fk_soc=' . intval($fk_soc)
 			. ' AND unitprice=' . floatval($unitprice)
 			. ' AND quantity=' . intval($qte);
+		if (isModEnabled("multicurrency")) {
+			$sql .= ' AND fk_multicurrency ='. intval($soc->fk_multicurrency);
+		}
+
         if (!empty($vat_src_code)) {
         	$sql .= ' AND default_vat_code="' . $db->escape($vat_src_code).'"';
         }
-
 
         $resq = $db->query($sql);
 		if (!$resq) {
@@ -166,8 +168,24 @@
 
              $product->product_fourn_id = $fourn->id;
 
-            // La methode update_buyprice() renvoie -1 ou -2 en cas d'erreur ou l'id de l'objet modifié ou créé en cas de réussite
-             $ret=$product->update_buyprice($qte , $price, $user, 'HT', $fourn, 1, $ref, $tvatx, 0, 0, 0, 0, 0, '', array(), $vat_src_code, $price);
+			$currencyCode = "";
+			$multicurrencyTx = 1;
+
+			if (isModEnabled("multicurrency")) {
+				dol_include_once('/fourn/class/fournisseur.commande.class.php');
+
+				$order = new CommandeFournisseur($db);
+
+				if ($order->fetch($fk_order)) {
+					$currencyCode = $order->multicurrency_code;
+					$multicurrencyTx = $order->multicurrency_tx;
+					$price_ht_devise = price2num($price, 'CU') * $multicurrencyTx;
+				}
+			}
+
+			// La methode update_buyprice() renvoie -1 ou -2 en cas d'erreur ou l'id de l'objet modifié ou créé en cas de réussite
+			$ret=$product->update_buyprice($qte , $price, $user, 'HT', $fourn, 1, $ref, $tvatx, 0, 0, 0, 0, 0, '', array(), $vat_src_code, $price_ht_devise, "HT", $multicurrencyTx, $currencyCode);
+
         }
 
         ob_clean();
