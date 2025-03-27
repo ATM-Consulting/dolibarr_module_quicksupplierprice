@@ -176,6 +176,7 @@ class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHook
                 <td align="right">Qté</td>
                 <td align="right">Total HT</td>
                 <td align="right">Réf.</td>
+                <td align="right">Remise</td>
                 <td colspan="<?php echo $colspan+1 ?>">&nbsp;</td>
             </tr>
             <tr class="impair">
@@ -191,6 +192,7 @@ class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHook
                 <td align="right"><input type="text" value="1" class="flat" id="qty_qsp" name="qty_qsp" size="2"></td>
                 <td align="right"><input type="text" value="" class="flat" id="price_ht_qsp" name="price_ht_qsp" size="5"></td>
                 <td align="right"><input type="text" value="" class="flat" id="ref_qsp" name="ref_qsp" size="5"></td>
+                <td align="right"><input type="text" value="" class="flat" id="remise" name="remise" size="5"></td>
                 <td align="right">&nbsp;</td>
                 <td colspan="<?php echo $colspan ?>"><input type="button" name="bt_add_qsp" id="bt_add_qsp" value="Créer le prix et ajouter" class="button"/></td>
             </tr>
@@ -229,11 +231,13 @@ class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHook
 								idprod: $("#idprod_qsp").val(),
 								ref_search: $('#search_idprod_qsp').val(),
 								fk_supplier: <?php echo !empty($object->socid) ? $object->socid : $object->fk_soc ?>,
-								fk_order: <?php echo $object->id ?>,
+								fk_element: <?php echo $object->id ?>,
 								price: $("#price_ht_qsp").val(),
 								qty: $("#qty_qsp").val(),
 								tvatx: $("#tva_tx_qsp").val(),
-								ref: $("#ref_qsp").val()
+								ref: $("#ref_qsp").val(),
+								remise: $("#remise").val(),
+								element: "<?php echo isset($object->element) ? addslashes($object->element) : '' ?>"
 							},
 							method: "post",
 							dataType: 'json'
@@ -286,8 +290,10 @@ class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHook
 								qty: $("#qty_qsp").val(),
 								tvatx: $("#tva_tx_qsp").val(),
 								ref: $("#ref_qsp").val(),
+								remise: $("#remise").val(),
 								token: $("input[name='token']").val(),
-								fk_order: <?php echo $object->id ?>
+								fk_element: <?php echo $object->id ?>,
+								element: "<?php echo isset($object->element) ? addslashes($object->element) : '' ?>"
 							},
 							method: "post",
 							dataType: 'json'
@@ -315,7 +321,6 @@ class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHook
 						if (event.key === "Enter") {
 							event.preventDefault(); // Empêche la soumission classique du formulaire
 							// Appelle la même logique que le clic sur le bouton
-							// debugger;
 							console.log($("#idprod_qsp").val());
 
 							if($("#idprod_qsp").val() < 0){
