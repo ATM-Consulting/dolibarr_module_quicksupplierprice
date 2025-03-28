@@ -67,7 +67,7 @@
         $sql .= ' AND s.status=1';
         $sql .= ' AND pfp.fk_product = '.intval($id_prod).' AND pfp.unitprice < '. floatval($unitprice);
 		if (!empty($remise)) {
-			$sql .= ' AND remise_percent ='. intval($remise);
+			$sql .= ' AND remise_percent ='. floatval($remise);
 		}
         $res = $db->query($sql);
         $nb = $db->num_rows($res);
@@ -155,7 +155,7 @@
 			. ' AND unitprice=' . floatval($unitprice)
 			. ' AND quantity=' . intval($qte);
 		if (!empty($remise)) {
-			$sql .= ' AND remise_percent ='. intval($remise);
+			$sql .= ' AND remise_percent ='. floatval($remise);
 		}
 		if (isModEnabled("multicurrency")) {
 			$sql .= ' AND fk_multicurrency ='. intval($soc->fk_multicurrency);
@@ -188,10 +188,10 @@
 
 			if (isModEnabled("multicurrency")) {
 				if ($element == 'invoice_supplier') {
-					dol_include_once('/fourn/class/fournisseur.facture.class.php');
+					 require_once DOL_DOCUMENT_ROOT."/fourn/class/fournisseur.facture.class.php";
 					$element = new FactureFournisseur($db);
 				} elseif($element == 'order_supplier') {
-					dol_include_once('/fourn/class/fournisseur.commande.class.php');
+					require_once DOL_DOCUMENT_ROOT."/fourn/class/fournisseur.commande.class.php";
 					$element = new CommandeFournisseur($db);
 				}
 
@@ -204,7 +204,7 @@
 
 
 			// La methode update_buyprice() renvoie -1 ou -2 en cas d'erreur ou l'id de l'objet modifié ou créé en cas de réussite
-			$ret=$product->update_buyprice($qte , $price, $user, 'HT', $fourn, 1, $ref, $tvatx, 0, !empty($remise) ? (float)$remise : 0, 0, 0, 0, '', array(), $vat_src_code, $price_ht_devise, "HT", $multicurrencyTx, $currencyCode);
+			$ret = $product->update_buyprice($qte , $price, $user, 'HT', $fourn, 1, $ref, $tvatx, 0, !empty($remise) ? (float)$remise : 0, 0, 0, 0, '', array(), $vat_src_code, $price_ht_devise, "HT", $multicurrencyTx, $currencyCode);
 
         }
 

@@ -242,12 +242,9 @@ class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHook
 							method: "post",
 							dataType: 'json'
 						}).done(function(data) {
-							console.log(data.nb);
 							if(data.nb == 0) { // Si aucun prix inférieur, on met à jour le prix
-								console.log('Pas moins cher ailleurs');
 								updatePrice();
 							} else { // Si le produit est moins cher ailleurs, on propose la liste des prix inférieurs
-								console.log('Moins cher ailleurs');
 								listPrice(data);
 							}
 						});
