@@ -6,7 +6,7 @@ ATMAbout = Ce module a été développé par <a href="http://www.atm-consulting.
 quicksupplierpriceSetup = Configuration du module Prix Fournisseur Rapide
 quicksupplierpriceAbout = A propos du module Prix Fournisseur Rapide
 
-BestPrice = Chercher les prix inférieurs lors de la création de la ligne
+QSP_SEARCH_PRICES = Chercher les prix inférieurs lors de la création de la ligne
 NewCommandeGen = Une nouvelle commande fournisseur a été créée
 
 PriceSelection = Sélection du prix
