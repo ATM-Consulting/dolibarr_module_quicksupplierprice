@@ -1,11 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-### UNRELEASED
+## UNRELEASED
+
+## Release 1.5
 - NEW : Ajout de la prise en charge de la conversion lorsque le module multicurrency est actif - *18/03/2025* - 1.5.0
     + Refonte admin
     + validation sur saisi entrer
     + ajout du champ remise
+
 ## Release 1.4
 - FIX : Dolibarr compatibility V21 - *09/12/2024* - 1.4.1
 - NEW : COMPAT V20 - *25/07/2024* - 1.4.0
