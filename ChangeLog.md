@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ### UNRELEASED
-- FIX : pour centage de remise non ajouté à la ligne - *07/04/2025* - 1.5.1
+- FIX : pourcentage de remise non ajouté à la ligne - *07/04/2025* - 1.5.1
 - NEW : Ajout de la prise en charge de la conversion lorsque le module multicurrency est actif - *18/03/2025* - 1.5.0
     + Refonte admin
     + validation sur saisi entrer
