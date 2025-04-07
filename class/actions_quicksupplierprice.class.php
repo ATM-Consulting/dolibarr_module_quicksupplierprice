@@ -192,7 +192,7 @@ class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHook
                 <td align="right"><input type="text" value="1" class="flat" id="qty_qsp" name="qty_qsp" size="2"></td>
                 <td align="right"><input type="text" value="" class="flat" id="price_ht_qsp" name="price_ht_qsp" size="5"></td>
                 <td align="right"><input type="text" value="" class="flat" id="ref_qsp" name="ref_qsp" size="5"></td>
-                <td align="right"><input type="text" value="" class="flat" id="remise" name="remise" size="5"></td>
+                <td align="right"><input type="text" value="" class="flat" id="remise_percent_qsp" name="remise_percent_qsp" size="5"></td>
                 <td align="right">&nbsp;</td>
                 <td colspan="<?php echo $colspan ?>"><input type="button" name="bt_add_qsp" id="bt_add_qsp" value="Créer le prix et ajouter" class="button"/></td>
             </tr>
@@ -236,7 +236,7 @@ class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHook
 								qty: $("#qty_qsp").val(),
 								tvatx: $("#tva_tx_qsp").val(),
 								ref: $("#ref_qsp").val(),
-								remise: $("#remise").val(),
+								remise_percent_qsp: $("#remise_percent_qsp").val(),
 								element: "<?php echo isset($object->element) ? addslashes($object->element) : '' ?>"
 							},
 							method: "post",
@@ -287,7 +287,7 @@ class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHook
 								qty: $("#qty_qsp").val(),
 								tvatx: $("#tva_tx_qsp").val(),
 								ref: $("#ref_qsp").val(),
-								remise: $("#remise").val(),
+								remise_percent_qsp: $("#remise_percent_qsp").val(),
 								token: $("input[name='token']").val(),
 								fk_element: <?php echo $object->id ?>,
 								element: "<?php echo isset($object->element) ? addslashes($object->element) : '' ?>"
@@ -304,6 +304,7 @@ class Actionsquicksupplierprice extends quicksupplierprice\RetroCompatCommonHook
 									$("#price_ht").val($("#price_ht_qsp").val() / $("#qty_qsp").val());
 								}
 								$("#qty").val($("#qty_qsp").val());
+								$("#remise_percent").val($("#remise_percent_qsp").val());
 
 								$("#addline").click(); // Ajoute la ligne à la commande
 							} else { // Erreur dans la saisie

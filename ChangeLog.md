@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## UNRELEASED
 
 ## Release 1.5
+- FIX : pourcentage de remise non ajouté à la ligne - *07/04/2025* - 1.5.1
 - NEW : Ajout de la prise en charge de la conversion lorsque le module multicurrency est actif - *18/03/2025* - 1.5.0
     + Refonte admin
     + validation sur saisi entrer
@@ -18,11 +19,11 @@ All notable changes to this project will be documented in this file.
 
 ## Release 1.2
 - NEW :   Changed Dolibarr compatibility range to 12 min - 19 max   	- *04/12/2023* - 1.2.0
-          Changed PHP compatibility range to 7.0 min - 8.2 max		- *04/12/2023* - 1.2.0
+  Changed PHP compatibility range to 7.0 min - 8.2 max		- *04/12/2023* - 1.2.0
 
 ## Release 1.0
 - FIX : Compatibility v17 / PHP 8 - interface.php add NOCSRFCHECK - *31/01/2023* - 1.1.11
-- FIX : Missing icon - *17/10/2022* - 1.1.10 
+- FIX : Missing icon - *17/10/2022* - 1.1.10
 - FIX : PHP 8 - *19/08/2022* - 1.1.9
 - FIX : `Interface.php` has fatal errors (invisible to user) due to SQL
   injection of empty input values - *29/06/2022* - 1.1.8
