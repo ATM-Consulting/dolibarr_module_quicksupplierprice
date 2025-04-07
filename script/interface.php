@@ -21,8 +21,7 @@
     $tvatx = GETPOST('tvatx', 'alpha');                     		// taux de tva saisi
     $fk_element = (int)GETPOST('fk_element','int');  // id de la commande en cours de modification
 	$element = GETPOST('element','alpha');  // type d'element de l'objet
-	$remise = GETPOST('remise','int');  // remise de l'objet
-
+	$remise = GETPOST('remise_percent_qsp','int');  // remise de l'objet
     // si la ref est laissée vide je rempli la ref (ne pas utiliser pour l'instant)
     // if($ref == '') $ref = 'FP-'.$fk_soc.'-'.$id_prod.'-'.$price;
     switch($put){
